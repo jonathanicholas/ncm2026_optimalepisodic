@@ -51,6 +51,25 @@ ncm2026_optimalepisodic/
 │       ├── run_kfold_cv.py            #     K-fold cross-validation framework
 │       └── parameter_recovery_sweep.py #    Systematic parameter recovery (500 combos)
 │
+├── training/                          # RNN training pipeline
+│   ├── run_train.sh                   #   SLURM: train network (jobid 0-9, one seed per job)
+│   ├── run_simulate.sh                #   SLURM: run simulation with trained network
+│   ├── run_transform.sh               #   SLURM: convert simulation pickle to JSON
+│   ├── submit_train.sh                #   Submit training jobs to cluster
+│   ├── submit_simulate.sh             #   Submit simulation jobs to cluster
+│   ├── submit_transform.sh            #   Submit transform jobs to cluster
+│   ├── train.py                       #   Train RNN via A2C
+│   ├── simulate.py                    #   Simulate trained network (100k trials)
+│   ├── transform.py                   #   Convert simulation pickle to JSON format
+│   └── modules/                       #   Core training modules
+│       ├── environment.py             #     Gymnasium environment
+│       ├── network.py                 #     SharedGRURecurrentActorCriticPolicy
+│       ├── a2c.py                     #     A2C trainer
+│       ├── replaybuffer.py            #     Replay buffer for rollout storage
+│       ├── simulation.py              #     Simulation utilities
+│       ├── argument.py                #     Argument parsing and serialization
+│       └── utils.py                   #     Miscellaneous utilities
+│
 ├── metarnn/                           # Neural network model comparisons
 │   ├── run_nn_pipeline.sh             #   Pipeline: process NNs -> compare -> Bayesian stats
 │   ├── create_nn_figures.sh           #   Sub-pipeline: JSON simulations -> human-like CSVs + figures
@@ -155,7 +174,49 @@ run_kfold10_rt_transition_models.sh  (10-fold CV, 5 seeds)
 
 **Outputs:** `output/addm/kfold/`, `output/addm/kfold_compare/`, `output/addm/ppc/`, `output/addm/parameter_recovery_sweep/`, `output/addm/FigureS3.pdf`
 
-### 4. Neural Network Comparisons (`metarnn/run_nn_pipeline.sh <SIM_NAME> <NINPUTS>`)
+### 4. RNN Training (`training/` — HPC cluster)
+
+Trains a GRU-based recurrent actor-critic policy from scratch via A2C, then simulates behavior and converts the output to JSON for downstream NN analysis. Each job corresponds to one random seed; 10 seeds are run per condition via SLURM array (indices 0–9).
+
+```
+train.py  -->  simulate.py  -->  transform.py
+```
+
+The key condition variable is `init_num_items`, which controls how many episodic memory items are available at the start of each trial (e.g., 0 for the no-memory baseline, 5 for the partial-memory agent).
+
+**Key training hyperparameters** (defaults in `training/modules/argument.py`):
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `hidden_size` | 100 | GRU hidden units |
+| `num_episodes` | 25,000,000 | Total training episodes |
+| `batch_size` | 40 | Parallel environments per update |
+| `lr` | 1e-3 | Adam learning rate |
+| `gamma` | 1.0 | Temporal discount (undiscounted) |
+| `lamda` | 1.0 | GAE λ coefficient |
+| `beta_v` | 0.05 | Value loss coefficient |
+| `beta_e` | 0.05 | Entropy regularization coefficient |
+| `stay_cost` | 0.008 | Per-step cost for fixating the same item |
+| `saccade_cost` | 0.04 | Cost for shifting fixation |
+
+**Outputs:** `training/results/exp_{init_num_items}_{jobid}/net.pth`, `data_training.p`, `data_simulation.p`; JSON files written to `training/results/data_json/data_{init_num_items}_{jobid}.json`.
+
+The JSON output from `transform.py` matches the format consumed by the `metarnn/` pipeline. Copy or symlink the JSON files into `metarnn/simulations/` before running Pipeline 5.
+
+To run on a SLURM cluster:
+
+```bash
+cd training
+
+# Train 10 seeds for each condition
+sbatch submit_train.sh
+
+# After training completes: simulate then transform
+sbatch submit_simulate.sh
+sbatch submit_transform.sh
+```
+
+### 5. Neural Network Comparisons (`metarnn/run_nn_pipeline.sh <SIM_NAME> <NINPUTS>`)
 
 Processes NN simulation JSON files into human-format CSVs, generates comparison figures, and fits Bayesian mixed-effects models comparing human vs NN and NN vs NN behavior.
 
