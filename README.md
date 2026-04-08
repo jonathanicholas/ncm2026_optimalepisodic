@@ -176,7 +176,7 @@ run_kfold10_rt_transition_models.sh  (10-fold CV, 5 seeds)
 
 ### 4. RNN Training (`training/` — HPC cluster)
 
-Trains a GRU-based recurrent actor-critic policy from scratch via A2C, then simulates behavior and converts the output to JSON for downstream NN analysis. Each job corresponds to one random seed; 10 seeds are run per condition via SLURM array (indices 0–9).
+Trains a GRU-based recurrent actor-critic policy from scratch via A2C, then simulates behavior and converts the output to JSON for downstream NN analysis. Each job corresponds to one random seed; 5 seeds are run per condition via SLURM array (indices 0–9).
 
 ```
 train.py  -->  simulate.py  -->  transform.py
@@ -208,7 +208,7 @@ To run on a SLURM cluster:
 ```bash
 cd training
 
-# Train 10 seeds for each condition
+# Train 5 seeds for each condition
 sbatch submit_train.sh
 
 # After training completes: simulate then transform
