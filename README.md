@@ -59,7 +59,6 @@ ncm2026_optimalepisodic/
 │   ├── run_mixed_effects_human_vs_nn.R     # Bayesian models: human vs NN
 │   ├── run_mixed_effects_nn_nn_comparison.R  # Bayesian models: NN vs NN
 │   ├── run_mixed_effects_next_fixation_gen.R  # Bayesian models: fixation advantage + transitions
-│   ├── docs/                          #   Analysis documentation
 │   ├── lib/                           #   NN analysis tools
 │   │   ├── compile_nn_to_human_fixations.py  # Convert NN JSON output to human-format CSVs
 │   │   ├── analyze_NN_behavior.py     #     Compile NN behavioral summaries
