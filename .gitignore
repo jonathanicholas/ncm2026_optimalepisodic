@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Regenerable intermediates
+metarnn/simulations/human_like_*/output/choice_fixations_clean_buffer_50.csv
+metarnn/simulations/human_like_*/output/eyegaze/stats/choice_fixation_*_trial_deltas_long_duration.csv
+
+# Caches
+**/_cache/
+**/cache/*.pkl
+
+# Editor
+.vscode/
+.idea/
+
+# AI agent
+CLAUDE.md
+.claude/

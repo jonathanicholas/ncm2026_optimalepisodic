@@ -1,0 +1,14 @@
+nn_root=metarnn/simulations/human_like_04_04_input0
+out_dir=metarnn/simulations/human_like_04_04_input0/output/human_comparison
+tag=04_04_input0
+human_stats_dir=output/eyegaze/stats
+nn_stats_dir=metarnn/simulations/human_like_04_04_input0/output/eyegaze/stats
+human_by_sub=output/eyegaze/stats/revisits_count_and_duration_by_subject_human.csv
+nn_by_sub=metarnn/simulations/human_like_04_04_input0/output/eyegaze/stats/revisits_count_and_duration_by_subject_nn_04_04_input0.csv
+human_clean_choice_fixations=output/choice_fixations_clean_buffer_50.csv
+nn_clean_choice_fixations=metarnn/simulations/human_like_04_04_input0/output/choice_fixations_clean_buffer_50.csv
+max_fixations=40
+cumtime_mode=all_trials
+cumtime_hline_y=0.8
+duration_by_position_keep_first_n=6
+duration_by_position_max_fixations=8

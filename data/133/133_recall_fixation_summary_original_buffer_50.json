@@ -1,0 +1,14 @@
+{
+  "pre_recall": {
+    "mean_proportion_duration_at_target": 0.3588820708601962,
+    "total_recalls_analyzed": 32,
+    "recalls_with_target_fixations": 21,
+    "mean_image_fixations_per_recall": 5.0
+  },
+  "during_recall": {
+    "mean_proportion_duration_at_target": 0.3210517243044102,
+    "total_recalls_analyzed": 32,
+    "recalls_with_target_fixations": 12,
+    "mean_image_fixations_per_recall": 1.59375
+  }
+}

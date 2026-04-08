@@ -1,0 +1,21 @@
+name: analysis
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.11
+  - r-base>=4.4
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scipy
+  - scikit-learn
+  - statsmodels
+  - tqdm
+  - pillow
+  - pip
+  - pip:
+    - PyBADS
+  # R packages (install via R after creating the environment)
+  # install.packages(c("brms", "readr", "dplyr", "tidyr", "broom.mixed"))

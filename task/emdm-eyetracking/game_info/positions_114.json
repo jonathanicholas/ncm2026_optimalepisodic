@@ -1,0 +1,18 @@
+{
+  "Object_Sea_Pattern_Large": 3,
+  "Object_Land_Pattern_Small": 2,
+  "Animal_Sea_Solid_Large": 0,
+  "Object_Sea_Solid_Large": 1,
+  "Animal_Land_Pattern_Small": 4,
+  "Animal_Land_Solid_Small": 5,
+  "Object_Sea_Solid_Small": 0,
+  "Animal_Land_Solid_Large": 3,
+  "Animal_Land_Pattern_Large": 1,
+  "Object_Land_Pattern_Large": 4,
+  "Animal_Sea_Solid_Small": 2,
+  "Object_Sea_Pattern_Small": 5,
+  "Object_Land_Solid_Small": 0,
+  "Animal_Sea_Pattern_Large": 2,
+  "Object_Land_Solid_Large": 3,
+  "Animal_Sea_Pattern_Small": 1
+}

@@ -1,0 +1,17 @@
+{
+  "n_clusters": 1,
+  "cluster_pvals": [
+    0.0
+  ],
+  "significant_clusters": 1,
+  "permutation_testing_enabled": true,
+  "clusters": [
+    {
+      "start_time": -1350.0,
+      "end_time": 75.0,
+      "size": 58,
+      "sum_t_statistic": 272.84717999479517,
+      "p_value": 0.0
+    }
+  ]
+}

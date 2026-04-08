@@ -1,0 +1,8 @@
+Group time course cluster summary
+ROI type: original
+Buffer size: 50
+Permutation testing enabled: True
+Number of clusters: 1
+Significant clusters (alpha=0.05): 1
+
+Cluster 1: -1350 to 75 ms, size=58, sum_t=272.847, p=0.0000

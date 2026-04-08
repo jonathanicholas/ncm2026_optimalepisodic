@@ -1,0 +1,51 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: log_duration ~ relevance * position_bin + (relevance * position_bin | subject_id) 
+   Data: h_fix (Number of observations: 18299) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject_id (Number of levels: 41) 
+                                         Estimate Est.Error l-95% CI u-95% CI
+sd(Intercept)                                0.35      0.05     0.26     0.46
+sd(relevance)                                0.18      0.05     0.08     0.29
+sd(position_bin)                             0.03      0.01     0.01     0.04
+sd(relevance:position_bin)                   0.03      0.01     0.01     0.04
+cor(Intercept,relevance)                     0.45      0.23    -0.02     0.86
+cor(Intercept,position_bin)                 -0.34      0.22    -0.69     0.16
+cor(relevance,position_bin)                  0.03      0.31    -0.61     0.57
+cor(Intercept,relevance:position_bin)       -0.48      0.26    -0.92     0.07
+cor(relevance,relevance:position_bin)       -0.78      0.21    -0.98    -0.17
+cor(position_bin,relevance:position_bin)    -0.18      0.32    -0.69     0.52
+                                         Rhat Bulk_ESS Tail_ESS
+sd(Intercept)                            1.00     1381     2454
+sd(relevance)                            1.01      663      545
+sd(position_bin)                         1.01      578     1238
+sd(relevance:position_bin)               1.01      595      515
+cor(Intercept,relevance)                 1.00     1429     1577
+cor(Intercept,position_bin)              1.00     1704     2464
+cor(relevance,position_bin)              1.01      744     1154
+cor(Intercept,relevance:position_bin)    1.00     1331     1730
+cor(relevance,relevance:position_bin)    1.00      999      771
+cor(position_bin,relevance:position_bin) 1.00     1022     1580
+
+Regression Coefficients:
+                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                  5.81      0.06     5.69     5.93 1.00      998
+relevance                  0.17      0.04     0.08     0.26 1.00     2356
+position_bin               0.00      0.01    -0.01     0.02 1.00     3018
+relevance:position_bin    -0.01      0.01    -0.03     0.00 1.00     2398
+                       Tail_ESS
+Intercept                  1532
+relevance                  2472
+position_bin               3057
+relevance:position_bin     2652
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.88      0.00     0.88     0.89 1.00     8115     2860
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

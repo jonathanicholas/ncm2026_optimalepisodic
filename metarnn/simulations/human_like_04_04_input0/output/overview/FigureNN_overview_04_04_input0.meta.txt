@@ -1,0 +1,10 @@
+root=metarnn/simulations/human_like_04_04_input0
+out_dir=metarnn/simulations/human_like_04_04_input0/output/overview
+tag=04_04_input0
+metric=duration
+behavior_source=behavior_rebuilt
+behavior_cache=metarnn/simulations/human_like_04_04_input0/output/overview/cache/nn_trial_level_behavior_cached.csv
+eye_trial_cache=metarnn/simulations/human_like_04_04_input0/output/overview/cache/Figure3_NN_trial_level_duration.csv
+prop_time_pred_summary=metarnn/simulations/human_like_04_04_input0/output/eyegaze/stats/summary_prop_time_location_interactions_true_all_norm-within.csv
+prop_time_pred_coef_table=metarnn/simulations/human_like_04_04_input0/output/eyegaze/stats/coef_table_prop_time_location_interactions_true_all_norm-within.csv
+human_data_dir=output

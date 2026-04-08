@@ -1,0 +1,34 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: delta ~ dec_c * valence_c * position 
+   Data: d_long (Number of observations: 140) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                    0.04      0.00     0.04     0.05 1.00     4350
+dec_c                       -0.01      0.00    -0.01     0.00 1.00     3064
+valence_c                    0.00      0.00    -0.00     0.01 1.00     3659
+position                    -0.00      0.00    -0.00     0.00 1.00     4277
+dec_c:valence_c              0.05      0.01     0.03     0.06 1.00     2231
+dec_c:position               0.00      0.00    -0.00     0.00 1.00     3207
+valence_c:position          -0.00      0.00    -0.00     0.00 1.00     3715
+dec_c:valence_c:position     0.01      0.00     0.01     0.01 1.00     2299
+                         Tail_ESS
+Intercept                    2803
+dec_c                        2038
+valence_c                    2319
+position                     2709
+dec_c:valence_c              2143
+dec_c:position               2266
+valence_c:position           2843
+dec_c:valence_c:position     2575
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.01      0.00     0.01     0.01 1.00     2171     2071
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

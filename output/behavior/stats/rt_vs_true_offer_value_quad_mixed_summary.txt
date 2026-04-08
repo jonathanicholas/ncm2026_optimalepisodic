@@ -1,0 +1,37 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: log_rt ~ 1 + true_offer_value_z + true_offer_value_z2 + (1 + true_offer_value_z + true_offer_value_z2 | subject) 
+   Data: d_rt_ov (Number of observations: 2359) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 43) 
+                                            Estimate Est.Error l-95% CI
+sd(Intercept)                                   0.76      0.09     0.61
+sd(true_offer_value_z)                          0.04      0.03     0.00
+sd(true_offer_value_z2)                         0.03      0.02     0.00
+cor(Intercept,true_offer_value_z)              -0.16      0.41    -0.86
+cor(Intercept,true_offer_value_z2)             -0.51      0.34    -0.95
+cor(true_offer_value_z,true_offer_value_z2)    -0.00      0.48    -0.85
+                                            u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)                                   0.95 1.00      595     1299
+sd(true_offer_value_z)                          0.11 1.00     1203     1707
+sd(true_offer_value_z2)                         0.06 1.00     1713     1762
+cor(Intercept,true_offer_value_z)               0.70 1.00     4780     2260
+cor(Intercept,true_offer_value_z2)              0.35 1.00     3794     2542
+cor(true_offer_value_z,true_offer_value_z2)     0.86 1.00     2659     3272
+
+Regression Coefficients:
+                    Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept               1.62      0.12     1.39     1.87 1.01      433      749
+true_offer_value_z     -0.00      0.02    -0.05     0.04 1.00     5580     2813
+true_offer_value_z2     0.01      0.01    -0.01     0.03 1.00     4368     3246
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.94      0.01     0.92     0.97 1.00     7109     2941
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

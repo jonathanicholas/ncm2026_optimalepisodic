@@ -1,0 +1,3 @@
+value_source,feature_set,visit_type,visit_normalization,regularization,n_folds,seed,n_bootstrap,n_sims,n_subjects,n_rows_total,n_rows_cv,cv_mean,cv_sem,term,coef_mean,coef_lo,coef_hi
+true,location_interactions,all,within,l2,10,1,50,0,5,333060,333060,0.7513210832882964,0.0007308218427213943,Irrelevant x Reward,0.02539865489261015,0.01870320304443556,0.03394173674686317
+true,location_interactions,all,within,l2,10,1,50,0,5,333060,333060,0.7513210832882964,0.0007308218427213943,Relevant x Reward,1.0528137278064513,1.0245485245273946,1.0845026423399655

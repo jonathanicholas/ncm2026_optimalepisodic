@@ -1,0 +1,59 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: delta ~ 1 + dec_c * valence * position + (1 + dec_c + valence + position | subject_id) 
+   Data: d_long_3way (Number of observations: 1106) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject_id (Number of levels: 41) 
+                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+sd(Intercept)               0.01      0.01     0.00     0.02 1.00     2009
+sd(dec_c)                   0.02      0.01     0.00     0.05 1.00      871
+sd(valence)                 0.09      0.01     0.06     0.12 1.00     1724
+sd(position)                0.00      0.00     0.00     0.01 1.00      658
+cor(Intercept,dec_c)       -0.07      0.44    -0.82     0.78 1.00     1221
+cor(Intercept,valence)     -0.07      0.42    -0.82     0.78 1.03      258
+cor(dec_c,valence)          0.36      0.37    -0.52     0.90 1.01      389
+cor(Intercept,position)    -0.12      0.45    -0.87     0.77 1.00     1042
+cor(dec_c,position)        -0.03      0.42    -0.79     0.76 1.01     1203
+cor(valence,position)       0.07      0.35    -0.63     0.73 1.00     1911
+                        Tail_ESS
+sd(Intercept)               2371
+sd(dec_c)                   1258
+sd(valence)                 2411
+sd(position)                1082
+cor(Intercept,dec_c)        1709
+cor(Intercept,valence)       535
+cor(dec_c,valence)           575
+cor(Intercept,position)     1570
+cor(dec_c,position)         1783
+cor(valence,position)       2168
+
+Regression Coefficients:
+                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                 -0.01      0.01    -0.03     0.01 1.00     7555
+dec_c                      0.01      0.02    -0.03     0.04 1.00     3783
+valence                   -0.01      0.02    -0.05     0.04 1.00     2863
+position                   0.00      0.00    -0.00     0.01 1.00     6450
+dec_c:valence              0.03      0.04    -0.04     0.11 1.00     3002
+dec_c:position             0.00      0.00    -0.01     0.01 1.00     3661
+valence:position           0.01      0.00     0.00     0.02 1.00     4535
+dec_c:valence:position    -0.01      0.01    -0.03     0.00 1.00     2925
+                       Tail_ESS
+Intercept                  2717
+dec_c                      2894
+valence                    2835
+position                   2821
+dec_c:valence              3059
+dec_c:position             2797
+valence:position           3116
+dec_c:valence:position     2990
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.14      0.00     0.14     0.15 1.00     3581     2618
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

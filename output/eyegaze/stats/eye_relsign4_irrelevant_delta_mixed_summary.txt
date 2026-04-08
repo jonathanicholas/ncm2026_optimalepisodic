@@ -1,0 +1,106 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: delta_from_chance ~ 1 + decision_label * valence_label + (1 + decision_label * valence_label | subject) 
+   Data: d_irr_delta (Number of observations: 3998) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 41) 
+                                                                    Estimate
+sd(Intercept)                                                           0.04
+sd(decision_labeltake)                                                  0.04
+sd(valence_labelpositive)                                               0.10
+sd(decision_labeltake:valence_labelpositive)                            0.06
+cor(Intercept,decision_labeltake)                                      -0.14
+cor(Intercept,valence_labelpositive)                                   -0.49
+cor(decision_labeltake,valence_labelpositive)                          -0.06
+cor(Intercept,decision_labeltake:valence_labelpositive)                -0.02
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)       -0.21
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)    -0.59
+                                                                    Est.Error
+sd(Intercept)                                                            0.01
+sd(decision_labeltake)                                                   0.02
+sd(valence_labelpositive)                                                0.02
+sd(decision_labeltake:valence_labelpositive)                             0.02
+cor(Intercept,decision_labeltake)                                        0.37
+cor(Intercept,valence_labelpositive)                                     0.22
+cor(decision_labeltake,valence_labelpositive)                            0.33
+cor(Intercept,decision_labeltake:valence_labelpositive)                  0.35
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)         0.39
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)      0.25
+                                                                    l-95% CI
+sd(Intercept)                                                           0.02
+sd(decision_labeltake)                                                  0.00
+sd(valence_labelpositive)                                               0.07
+sd(decision_labeltake:valence_labelpositive)                            0.01
+cor(Intercept,decision_labeltake)                                      -0.71
+cor(Intercept,valence_labelpositive)                                   -0.81
+cor(decision_labeltake,valence_labelpositive)                          -0.69
+cor(Intercept,decision_labeltake:valence_labelpositive)                -0.70
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)       -0.80
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)    -0.91
+                                                                    u-95% CI
+sd(Intercept)                                                           0.07
+sd(decision_labeltake)                                                  0.08
+sd(valence_labelpositive)                                               0.14
+sd(decision_labeltake:valence_labelpositive)                            0.11
+cor(Intercept,decision_labeltake)                                       0.70
+cor(Intercept,valence_labelpositive)                                    0.02
+cor(decision_labeltake,valence_labelpositive)                           0.61
+cor(Intercept,decision_labeltake:valence_labelpositive)                 0.62
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)        0.64
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)     0.06
+                                                                    Rhat
+sd(Intercept)                                                       1.00
+sd(decision_labeltake)                                              1.01
+sd(valence_labelpositive)                                           1.01
+sd(decision_labeltake:valence_labelpositive)                        1.01
+cor(Intercept,decision_labeltake)                                   1.00
+cor(Intercept,valence_labelpositive)                                1.01
+cor(decision_labeltake,valence_labelpositive)                       1.01
+cor(Intercept,decision_labeltake:valence_labelpositive)             1.00
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)    1.00
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive) 1.01
+                                                                    Bulk_ESS
+sd(Intercept)                                                            974
+sd(decision_labeltake)                                                   425
+sd(valence_labelpositive)                                                641
+sd(decision_labeltake:valence_labelpositive)                             484
+cor(Intercept,decision_labeltake)                                        936
+cor(Intercept,valence_labelpositive)                                     461
+cor(decision_labeltake,valence_labelpositive)                            266
+cor(Intercept,decision_labeltake:valence_labelpositive)                  858
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)         510
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)     1031
+                                                                    Tail_ESS
+sd(Intercept)                                                            951
+sd(decision_labeltake)                                                   446
+sd(valence_labelpositive)                                               1149
+sd(decision_labeltake:valence_labelpositive)                             471
+cor(Intercept,decision_labeltake)                                       1372
+cor(Intercept,valence_labelpositive)                                     848
+cor(decision_labeltake,valence_labelpositive)                            757
+cor(Intercept,decision_labeltake:valence_labelpositive)                 1490
+cor(decision_labeltake,decision_labeltake:valence_labelpositive)        1219
+cor(valence_labelpositive,decision_labeltake:valence_labelpositive)     1206
+
+Regression Coefficients:
+                                         Estimate Est.Error l-95% CI u-95% CI
+Intercept                                   -0.03      0.01    -0.05    -0.01
+decision_labeltake                          -0.01      0.01    -0.03     0.02
+valence_labelpositive                       -0.01      0.02    -0.05     0.03
+decision_labeltake:valence_labelpositive     0.01      0.02    -0.03     0.05
+                                         Rhat Bulk_ESS Tail_ESS
+Intercept                                1.00     2254     2778
+decision_labeltake                       1.00     2179     2375
+valence_labelpositive                    1.00     1499     2006
+decision_labeltake:valence_labelpositive 1.00     1758     2293
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.25      0.00     0.24     0.25 1.00     3959     3037
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

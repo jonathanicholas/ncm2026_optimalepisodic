@@ -1,0 +1,5 @@
+sweep_csv: metarnn/simulations/human_like_04_04_input5/output/eyegaze/stats/drop_sweep_summary.csv
+human_pred_csv: output/eyegaze/stats/summary_prop_time_location_interactions_recalled_all_norm-within.csv
+recall_csv: output/eyegaze/recall/recall_sig_timepoint_prop_fix_time.csv
+out_dir: metarnn/simulations/human_like_04_04_input5/output/overview
+tag: 04_04_input5

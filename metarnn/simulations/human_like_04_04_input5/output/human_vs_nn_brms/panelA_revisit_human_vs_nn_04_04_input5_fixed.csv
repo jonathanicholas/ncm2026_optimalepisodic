@@ -1,0 +1,2 @@
+effect,component,term,estimate,std.error,conf.low,conf.high
+fixed,cond,(Intercept),-0.007000525759774432,0.026490259086980956,-0.06117851211381593,0.04269177991758319

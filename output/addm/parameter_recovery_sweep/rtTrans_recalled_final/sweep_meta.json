@@ -1,0 +1,82 @@
+{
+  "created_at": "2026-03-14 23:49:27",
+  "run_tag": "rtTrans_recalled_final",
+  "n_combos": 1000,
+  "reps_per_combo": 1,
+  "units": "ms",
+  "sampling_bounds": {
+    "d_min": 1e-05,
+    "d_max": 0.001,
+    "theta_min": 0.01,
+    "theta_max": 0.99,
+    "sigma_min": 1e-05,
+    "sigma_max": 0.005,
+    "noise_param": "mu",
+    "mu_min": 1.0,
+    "mu_max": 100.0
+  },
+  "sampling_bounds_effective_internal": {
+    "d_min": 1e-05,
+    "d_max": 0.001,
+    "theta_min": 0.01,
+    "theta_max": 0.99,
+    "sigma_min": 1e-05,
+    "sigma_max": 0.005,
+    "noise_param": "mu",
+    "mu_min": 1.0,
+    "mu_max": 100.0
+  },
+  "fit_bounds": {
+    "d_min": 1e-05,
+    "d_max": 0.001,
+    "theta_min": 0.01,
+    "theta_max": 0.99,
+    "sigma_min": 1e-07,
+    "sigma_max": 10.0,
+    "fit_mu_min": 1.0,
+    "fit_mu_max": 100.0,
+    "fix_sigma": null,
+    "fix_theta": null
+  },
+  "fit_bounds_effective_internal": {
+    "d_min": 1e-05,
+    "d_max": 0.001,
+    "theta_min": 0.01,
+    "theta_max": 0.99,
+    "sigma_min": 1e-07,
+    "sigma_max": 10.0,
+    "noise_param": "mu",
+    "mu_min": 1.0,
+    "mu_max": 100.0,
+    "fixed_sigma": null,
+    "fixed_theta": null
+  },
+  "fit_init": {
+    "d0": 0.0005,
+    "theta0": 0.5,
+    "sigma0": 0.0005,
+    "mu0": 50.0
+  },
+  "fit_init_effective_internal": {
+    "d0": 0.0005,
+    "theta0": 0.5,
+    "sigma0": 0.0005,
+    "mu0": 50.0
+  },
+  "config": {
+    "time_col": "rt_ms",
+    "include_transition": true,
+    "reward_source": "recalled",
+    "data_dir": "data",
+    "irrelevant_mode": "zero",
+    "include_center_fixations": false,
+    "center_gaze_mode": "separate",
+    "center_mode": "same_as_irrelevant",
+    "n_v_bins": 7,
+    "rt_bins_max": 15,
+    "rt_bins_fixed": 0,
+    "min_trials_per_rt_bin": 25,
+    "n_sim_per_vbin": 1000,
+    "alpha": 1.0
+  }
+}

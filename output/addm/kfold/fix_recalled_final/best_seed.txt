@@ -1,0 +1,4 @@
+seed=1002
+split_seed=123
+mean_loglik_test_free3-rtTrans=-350.142495369408
+seed_scores_csv=output/model_fits/kfold/fix_recalled_final/runs/seed_scores_splitSeed123.csv

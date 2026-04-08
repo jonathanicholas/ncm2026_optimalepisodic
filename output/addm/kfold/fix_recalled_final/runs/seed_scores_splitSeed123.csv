@@ -1,0 +1,6 @@
+seed,mean_loglik_test_free3,mean_loglik_test_theta1,summary_free3,summary_theta1
+1000,-353.169976769692,-400.062996679950,output/model_fits/kfold/fix_recalled_final/runs/seed1000/addm_kfold_fit_summary_free3-rtTrans.csv,output/model_fits/kfold/fix_recalled_final/runs/seed1000/addm_kfold_fit_summary_theta1-rtTrans.csv
+1001,-350.378015016507,-398.251143500475,output/model_fits/kfold/fix_recalled_final/runs/seed1001/addm_kfold_fit_summary_free3-rtTrans.csv,output/model_fits/kfold/fix_recalled_final/runs/seed1001/addm_kfold_fit_summary_theta1-rtTrans.csv
+1002,-350.142495369408,-397.293148639409,output/model_fits/kfold/fix_recalled_final/runs/seed1002/addm_kfold_fit_summary_free3-rtTrans.csv,output/model_fits/kfold/fix_recalled_final/runs/seed1002/addm_kfold_fit_summary_theta1-rtTrans.csv
+1003,-352.422057703029,-398.135796986044,output/model_fits/kfold/fix_recalled_final/runs/seed1003/addm_kfold_fit_summary_free3-rtTrans.csv,output/model_fits/kfold/fix_recalled_final/runs/seed1003/addm_kfold_fit_summary_theta1-rtTrans.csv
+1004,-350.486085059482,-395.698125037690,output/model_fits/kfold/fix_recalled_final/runs/seed1004/addm_kfold_fit_summary_free3-rtTrans.csv,output/model_fits/kfold/fix_recalled_final/runs/seed1004/addm_kfold_fit_summary_theta1-rtTrans.csv

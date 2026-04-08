@@ -1,0 +1,26 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: log_duration ~ relevance * position_bin 
+   Data: nn_fix_dur (Number of observations: 3196828) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                  0.12      0.00     0.12     0.12 1.00     1395
+relevance                  0.02      0.00     0.01     0.02 1.00      860
+position_bin              -0.00      0.00    -0.00    -0.00 1.00     1754
+relevance:position_bin     0.00      0.00     0.00     0.00 1.00     1037
+                       Tail_ESS
+Intercept                  2230
+relevance                  1042
+position_bin               2443
+relevance:position_bin     1429
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.29      0.00     0.29     0.30 1.00     1534     1743
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

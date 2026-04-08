@@ -1,0 +1,30 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: true_value ~ 1 + recalled_value + (1 + recalled_value | subject) 
+   Data: d6 (Number of observations: 1799) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 43) 
+                              Estimate Est.Error l-95% CI u-95% CI Rhat
+sd(Intercept)                     0.09      0.07     0.00     0.25 1.00
+sd(recalled_value)                0.20      0.03     0.15     0.27 1.00
+cor(Intercept,recalled_value)     0.06      0.58    -0.95     0.95 1.02
+                              Bulk_ESS Tail_ESS
+sd(Intercept)                     1578     1467
+sd(recalled_value)                1023      677
+cor(Intercept,recalled_value)      112      437
+
+Regression Coefficients:
+               Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept         -0.09      0.09    -0.27     0.08 1.00     4822     1790
+recalled_value     0.75      0.03     0.68     0.82 1.00     1901     2030
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     3.73      0.06     3.61     3.85 1.00     5034     2919
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

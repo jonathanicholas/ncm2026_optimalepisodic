@@ -1,0 +1,24 @@
+ Family: student 
+  Links: mu = identity 
+Formula: fixation_advantage ~ 1 + (1 | subject) 
+   Data: d (Number of observations: 16301) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 41) 
+              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sd(Intercept)     0.13      0.02     0.10     0.16 1.01      734     1566
+
+Regression Coefficients:
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept    -0.11      0.02    -0.15    -0.07 1.00      264      786
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.50      0.01     0.48     0.51 1.00     2885     2883
+nu        1.18      0.02     1.14     1.22 1.00     3057     2858
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).
