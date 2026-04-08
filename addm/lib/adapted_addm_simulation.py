@@ -1,7 +1,7 @@
 """Simulation of the adapted aDDM for the eye-EMDM task.
 
-This module implements the discrete-time stochastic process described in
-`adapted_addm_model.tex`. It treats the fixation sequence as exogenous input
+This module implements the discrete-time stochastic process. It treats
+the fixation sequence as exogenous input
 and simulates the relative decision value (RDV) until it hits the fixed
 boundaries at +1 (Accept) or -1 (Leave).
 

@@ -1,4 +1,4 @@
-"""Group-level fitting utilities for the adapted aDDM (Option B).
+"""Group-level fitting utilities for the adapted aDDM.
 
 This module implements a simulation-based likelihood inspired by Krajbich et al.
 (2010), adapted to the eye-EMDM accept/leave task.
@@ -950,7 +950,7 @@ def simulate_trials_generative(
     n_sim_per_trial: int = 1,
     seed: int | None = None,
 ) -> pd.DataFrame:
-    """Simulate choices/RTs for each trial in `df_trials` under Option B.
+    """Simulate choices/RTs for each trial in `df_trials`.
 
     This produces a synthetic dataset that preserves the original trial
     structure (rewards/relevance/V_offer), but replaces observed outcomes with

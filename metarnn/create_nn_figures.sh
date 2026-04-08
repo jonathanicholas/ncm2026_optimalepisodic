@@ -3,8 +3,7 @@ set -euo pipefail
 
 # Create NN figures from an existing NN "human_like" export folder.
 #
-# This script is a thin driver that will grow over time as more NN figure
-# scripts are added.
+# Runs all NN figure-generation scripts in sequence.
 #
 # Usage:
 #   bash metarnn/create_nn_figures.sh \

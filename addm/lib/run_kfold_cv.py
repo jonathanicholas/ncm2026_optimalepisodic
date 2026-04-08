@@ -1,4 +1,4 @@
-"""K-fold cross-validation for the adapted aDDM (Option B).
+"""K-fold cross-validation for the adapted aDDM.
 
 This is a trial-level K-fold alternative to leave-one-game-out (LOGO).
 
@@ -369,7 +369,7 @@ def _run_fold_task(task: Dict[str, Any]) -> Dict[str, object]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="K-fold CV for the adapted aDDM (Option B).")
+    parser = argparse.ArgumentParser(description="K-fold CV for the adapted aDDM.")
 
     parser.add_argument("--mode", choices=["fit", "eval-only"], default="fit")
     parser.add_argument("--output-dir", type=str, default="output")

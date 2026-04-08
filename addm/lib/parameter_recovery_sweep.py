@@ -1,4 +1,4 @@
-"""Large-scale parameter recovery sweep for the adapted aDDM (Option B).
+"""Large-scale parameter recovery sweep for the adapted aDDM.
 
 This script samples many parameter combinations from a specified space,
 then for each combination:

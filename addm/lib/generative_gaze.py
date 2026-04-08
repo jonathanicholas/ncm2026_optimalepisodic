@@ -1,4 +1,4 @@
-"""Generative gaze model utilities for the adapted aDDM (Option B fitting).
+"""Generative gaze model utilities for the adapted aDDM.
 
 This module implements the *empirical* gaze generator
 
