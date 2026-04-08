@@ -1,6 +1,6 @@
-# Eye-tracking Episodic Memory Decision Making (EMDM-Eye)
+# Flexible decisions arise from optimally sampling memories
 
-This repository contains data and analysis code for an experiment testing whether eye tracking can serve as a process-tracing measure of episodic memory retrieval during decision making. Participants encoded item-reward associations, then made take/leave decisions based on auditorily cued features while eye gaze was recorded at 1000 Hz.
+This repository contains data and analysis code for the following manuscript [eventual bioRxiv link].
 
 ---
 
