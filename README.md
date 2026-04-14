@@ -119,14 +119,22 @@ ncm2026_optimalepisodic/
 │   │   └── parameter_recovery_sweep/  #     Recovery analysis results
 │   └── next_fixation_gen/             #   Human fixation generation analysis cache
 │
-├── feature_analysis/                  # Per-feature-dimension robustness check
-│   ├── run_feature_analysis.sh        #   Pipeline: data -> 8 brms fits -> FigureS7
-│   ├── scripts/                       #   build, compute, plot scripts
-│   ├── data/                          #   Intermediate per-trial CSVs
-│   └── output/
-│       ├── FigureS7.pdf               #     Figure S7 (also copied to output/figures/supplementary/)
-│       ├── feature_deviation_from_mean.csv
-│       └── model_summaries/
+├── supplemental_analysis/             # Supplementary robustness checks
+│   ├── feature_analysis/              #   Per-feature-dimension robustness
+│   │   ├── run_feature_analysis.sh    #     Pipeline: data -> 8 brms fits -> FigureS7
+│   │   ├── scripts/                   #     build, compute, plot scripts
+│   │   ├── data/                      #     Intermediate per-trial CSVs
+│   │   └── output/
+│   │       ├── FigureS7.pdf           #       Figure S7 (also copied to output/figures/supplementary/)
+│   │       ├── feature_deviation_from_mean.csv
+│   │       └── model_summaries/
+│   └── block_analysis/                #   Block-number (round) interaction check
+│       ├── run_block_analysis.sh      #     Pipeline: data -> 9 brms fits -> TableS8
+│       ├── scripts/                   #     build, compute scripts
+│       ├── data/                      #     Intermediate per-trial CSVs
+│       └── output/
+│           ├── block_interaction_table.csv   #  Table S8 rows (one per analysis)
+│           └── model_summaries/
 │
 ├── task/
 │   └── emdm-eyetracking/
@@ -140,7 +148,7 @@ ncm2026_optimalepisodic/
 
 ## Pipelines
 
-There are six analysis pipelines, each orchestrated by a top-level shell script. All scripts assume they are run from the repository root with the `analysis` conda environment active.
+There are seven analysis pipelines, each orchestrated by a top-level shell script. All scripts assume they are run from the repository root with the `analysis` conda environment active.
 
 ### 1. Behavioral Analysis (`analysis/run_behavior.sh`)
 
@@ -245,7 +253,7 @@ create_nn_figures.sh (input0 baseline)
 
 **Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
 
-### 6. Feature-dimension robustness (`feature_analysis/run_feature_analysis.sh`)
+### 6. Feature-dimension robustness (`supplemental_analysis/feature_analysis/run_feature_analysis.sh`)
 
 Fits per-feature-dimension reparameterizations of eight analyses from Pipelines 1 and 2 and produces Figure S7, summarising how each effect varies across the four feature dimensions.
 
@@ -256,7 +264,19 @@ build_choices.py
   --> plot_feature_deviation.py (FigureS7.pdf)
 ```
 
-**Outputs:** `feature_analysis/output/FigureS7.pdf`, `feature_analysis/output/feature_deviation_from_mean.csv`, `feature_analysis/output/model_summaries/*.{txt,csv}`, `output/figures/supplementary/FigureS7.pdf`
+**Outputs:** `supplemental_analysis/feature_analysis/output/FigureS7.pdf`, `.../feature_deviation_from_mean.csv`, `.../model_summaries/*.{txt,csv}`, `output/figures/supplementary/FigureS7.pdf`
+
+### 7. Block-number (round) robustness (`supplemental_analysis/block_analysis/run_block_analysis.sh`)
+
+Refits each headline effect from Pipelines 1 and 2 with an added block-number (round) interaction as both a fixed effect and a by-subject random slope, plus three memory-performance checks (item recall, value recall fidelity, location recall). Produces Table S8, a 9-row summary of interaction coefficients and 95% HDIs.
+
+```
+build_choices.py
+  --> build_eye_fixation.py
+  --> compute_block_stats.R   (9 brms fits; ~30-45 min)
+```
+
+**Outputs:** `supplemental_analysis/block_analysis/output/block_interaction_table.csv`, `.../model_summaries/*.{txt,csv}`
 
 ---
 
@@ -284,7 +304,7 @@ install.packages(c("brms", "readr", "dplyr", "tidyr", "broom.mixed"))
 
 ### Reproducing Results
 
-Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`. Pipeline 6 (feature-dimension robustness) depends on the same eye-tracking CSV produced by Pipeline 2.
+Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`. Pipelines 6 and 7 (feature-dimension and block-number robustness) depend on the eye-tracking CSV produced by Pipeline 2, and Pipeline 7 additionally reads the behavioral memory CSVs produced by Pipeline 1.
 
 Pre-computed outputs are included in `output/` and `metarnn/simulations/human_like_*/output/`, so results can be inspected without re-running.
 
@@ -305,7 +325,10 @@ bash addm/run_addm.sh rtTrans
 bash metarnn/run_nn_pipeline.sh 04_04 5
 
 # Pipeline 6: Feature-dimension robustness
-bash feature_analysis/run_feature_analysis.sh
+bash supplemental_analysis/feature_analysis/run_feature_analysis.sh
+
+# Pipeline 7: Block-number (round) robustness
+bash supplemental_analysis/block_analysis/run_block_analysis.sh
 ```
 
 ### Notes
@@ -333,7 +356,8 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 | Figure S4 | Fixation drop supplement | `metarnn/lib/plot_prop_drop_supplement.py` |
 | Figure S5 | Transition supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S6 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
-| Figure S7 | Per-feature-dimension robustness | `feature_analysis/scripts/plot_feature_deviation.py` |
+| Figure S7 | Per-feature-dimension robustness | `supplemental_analysis/feature_analysis/scripts/plot_feature_deviation.py` |
+| Table S8 | Block-number (round) interaction tests | `supplemental_analysis/block_analysis/scripts/compute_block_stats.R` |
 
 ---
 

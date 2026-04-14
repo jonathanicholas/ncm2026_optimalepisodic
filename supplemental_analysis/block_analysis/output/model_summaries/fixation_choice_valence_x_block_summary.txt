@@ -1,0 +1,148 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: delta_from_chance ~ decision_c * valence_c * game_c + (decision_c * valence_c * game_c | subject) 
+   Data: d_eye_long (Number of observations: 3998) 
+  Draws: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+         total post-warmup draws = 6000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 41) 
+                                                      Estimate Est.Error
+sd(Intercept)                                             0.03      0.01
+sd(decision_c)                                            0.04      0.02
+sd(valence_c)                                             0.08      0.01
+sd(game_c)                                                0.00      0.00
+sd(decision_c:valence_c)                                  0.19      0.03
+sd(decision_c:game_c)                                     0.01      0.00
+sd(valence_c:game_c)                                      0.04      0.01
+sd(decision_c:valence_c:game_c)                           0.04      0.02
+cor(Intercept,decision_c)                                -0.18      0.27
+cor(Intercept,valence_c)                                 -0.15      0.21
+cor(decision_c,valence_c)                                 0.29      0.25
+cor(Intercept,game_c)                                     0.10      0.33
+cor(decision_c,game_c)                                   -0.05      0.34
+cor(valence_c,game_c)                                    -0.05      0.33
+cor(Intercept,decision_c:valence_c)                       0.13      0.21
+cor(decision_c,decision_c:valence_c)                     -0.06      0.26
+cor(valence_c,decision_c:valence_c)                      -0.33      0.18
+cor(game_c,decision_c:valence_c)                          0.08      0.32
+cor(Intercept,decision_c:game_c)                         -0.00      0.32
+cor(decision_c,decision_c:game_c)                        -0.09      0.33
+cor(valence_c,decision_c:game_c)                         -0.07      0.33
+cor(game_c,decision_c:game_c)                             0.01      0.34
+cor(decision_c:valence_c,decision_c:game_c)               0.07      0.32
+cor(Intercept,valence_c:game_c)                           0.13      0.22
+cor(decision_c,valence_c:game_c)                         -0.08      0.26
+cor(valence_c,valence_c:game_c)                          -0.09      0.21
+cor(game_c,valence_c:game_c)                              0.04      0.33
+cor(decision_c:valence_c,valence_c:game_c)                0.10      0.20
+cor(decision_c:game_c,valence_c:game_c)                   0.11      0.33
+cor(Intercept,decision_c:valence_c:game_c)               -0.17      0.26
+cor(decision_c,decision_c:valence_c:game_c)               0.16      0.28
+cor(valence_c,decision_c:valence_c:game_c)                0.12      0.25
+cor(game_c,decision_c:valence_c:game_c)                  -0.05      0.34
+cor(decision_c:valence_c,decision_c:valence_c:game_c)    -0.16      0.24
+cor(decision_c:game_c,decision_c:valence_c:game_c)       -0.02      0.32
+cor(valence_c:game_c,decision_c:valence_c:game_c)        -0.15      0.25
+                                                      l-95% CI u-95% CI Rhat
+sd(Intercept)                                             0.02     0.04 1.00
+sd(decision_c)                                            0.00     0.07 1.00
+sd(valence_c)                                             0.05     0.11 1.00
+sd(game_c)                                                0.00     0.01 1.00
+sd(decision_c:valence_c)                                  0.13     0.25 1.00
+sd(decision_c:game_c)                                     0.00     0.02 1.00
+sd(valence_c:game_c)                                      0.03     0.06 1.00
+sd(decision_c:valence_c:game_c)                           0.01     0.07 1.01
+cor(Intercept,decision_c)                                -0.65     0.38 1.00
+cor(Intercept,valence_c)                                 -0.56     0.28 1.00
+cor(decision_c,valence_c)                                -0.25     0.73 1.00
+cor(Intercept,game_c)                                    -0.57     0.69 1.00
+cor(decision_c,game_c)                                   -0.66     0.60 1.00
+cor(valence_c,game_c)                                    -0.65     0.59 1.00
+cor(Intercept,decision_c:valence_c)                      -0.28     0.53 1.00
+cor(decision_c,decision_c:valence_c)                     -0.55     0.45 1.00
+cor(valence_c,decision_c:valence_c)                      -0.66     0.06 1.00
+cor(game_c,decision_c:valence_c)                         -0.55     0.67 1.00
+cor(Intercept,decision_c:game_c)                         -0.63     0.63 1.00
+cor(decision_c,decision_c:game_c)                        -0.69     0.57 1.00
+cor(valence_c,decision_c:game_c)                         -0.66     0.56 1.00
+cor(game_c,decision_c:game_c)                            -0.64     0.64 1.00
+cor(decision_c:valence_c,decision_c:game_c)              -0.56     0.66 1.00
+cor(Intercept,valence_c:game_c)                          -0.32     0.53 1.00
+cor(decision_c,valence_c:game_c)                         -0.58     0.44 1.00
+cor(valence_c,valence_c:game_c)                          -0.48     0.31 1.00
+cor(game_c,valence_c:game_c)                             -0.60     0.64 1.00
+cor(decision_c:valence_c,valence_c:game_c)               -0.29     0.48 1.00
+cor(decision_c:game_c,valence_c:game_c)                  -0.54     0.70 1.00
+cor(Intercept,decision_c:valence_c:game_c)               -0.65     0.35 1.00
+cor(decision_c,decision_c:valence_c:game_c)              -0.43     0.68 1.00
+cor(valence_c,decision_c:valence_c:game_c)               -0.37     0.60 1.00
+cor(game_c,decision_c:valence_c:game_c)                  -0.68     0.60 1.00
+cor(decision_c:valence_c,decision_c:valence_c:game_c)    -0.62     0.33 1.00
+cor(decision_c:game_c,decision_c:valence_c:game_c)       -0.63     0.60 1.00
+cor(valence_c:game_c,decision_c:valence_c:game_c)        -0.61     0.35 1.00
+                                                      Bulk_ESS Tail_ESS
+sd(Intercept)                                             2711     3899
+sd(decision_c)                                            1501     1613
+sd(valence_c)                                             3614     4639
+sd(game_c)                                                3554     3180
+sd(decision_c:valence_c)                                  3288     4839
+sd(decision_c:game_c)                                     3273     2924
+sd(valence_c:game_c)                                      3485     4617
+sd(decision_c:valence_c:game_c)                           2008     1737
+cor(Intercept,decision_c)                                 5365     4608
+cor(Intercept,valence_c)                                  3063     4316
+cor(decision_c,valence_c)                                 1490     2364
+cor(Intercept,game_c)                                    11496     4463
+cor(decision_c,game_c)                                    9101     4007
+cor(valence_c,game_c)                                     9409     4573
+cor(Intercept,decision_c:valence_c)                       2535     3586
+cor(decision_c,decision_c:valence_c)                      1158     2232
+cor(valence_c,decision_c:valence_c)                       3325     4141
+cor(game_c,decision_c:valence_c)                           876     2367
+cor(Intercept,decision_c:game_c)                         10522     4862
+cor(decision_c,decision_c:game_c)                         7956     4405
+cor(valence_c,decision_c:game_c)                         11136     4740
+cor(game_c,decision_c:game_c)                             5075     4476
+cor(decision_c:valence_c,decision_c:game_c)               9069     4742
+cor(Intercept,valence_c:game_c)                           2886     4427
+cor(decision_c,valence_c:game_c)                          1662     2297
+cor(valence_c,valence_c:game_c)                           3660     4392
+cor(game_c,valence_c:game_c)                              1060     2404
+cor(decision_c:valence_c,valence_c:game_c)                5171     5256
+cor(decision_c:game_c,valence_c:game_c)                   1401     2942
+cor(Intercept,decision_c:valence_c:game_c)                4133     4606
+cor(decision_c,decision_c:valence_c:game_c)               3537     4614
+cor(valence_c,decision_c:valence_c:game_c)                5495     4641
+cor(game_c,decision_c:valence_c:game_c)                   2163     4324
+cor(decision_c:valence_c,decision_c:valence_c:game_c)     6499     4944
+cor(decision_c:game_c,decision_c:valence_c:game_c)        2805     4317
+cor(valence_c:game_c,decision_c:valence_c:game_c)         5969     5145
+
+Regression Coefficients:
+                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                       0.04      0.01     0.02     0.05 1.00     4664
+decision_c                      0.00      0.01    -0.02     0.02 1.00     6777
+valence_c                       0.02      0.01    -0.01     0.05 1.00     4447
+game_c                         -0.00      0.00    -0.00     0.00 1.00     7651
+decision_c:valence_c            0.10      0.03     0.03     0.17 1.00     5121
+decision_c:game_c              -0.00      0.00    -0.01     0.01 1.00    11215
+valence_c:game_c               -0.01      0.01    -0.02     0.01 1.00     6314
+decision_c:valence_c:game_c     0.01      0.01    -0.01     0.03 1.00     7589
+                            Tail_ESS
+Intercept                       4773
+decision_c                      4562
+valence_c                       5071
+game_c                          4523
+decision_c:valence_c            4638
+decision_c:game_c               4283
+valence_c:game_c                4577
+decision_c:valence_c:game_c     5175
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.26      0.00     0.25     0.27 1.00     8685     4491
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

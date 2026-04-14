@@ -1,0 +1,292 @@
+ Family: bernoulli 
+  Links: mu = logit 
+Formula: choice_bin ~ 0 + feature_dim + feature_dim:true_offer_value_z + (0 + feature_dim + feature_dim:true_offer_value_z | subject) 
+   Data: d_choice (Number of observations: 2359) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 43) 
+                                                                                     Estimate
+sd(feature_dimanimacy)                                                                   0.18
+sd(feature_dimenvironment)                                                               0.30
+sd(feature_dimsize)                                                                      0.17
+sd(feature_dimtexture)                                                                   0.14
+sd(feature_dimanimacy:true_offer_value_z)                                                0.90
+sd(feature_dimenvironment:true_offer_value_z)                                            0.69
+sd(feature_dimsize:true_offer_value_z)                                                   0.48
+sd(feature_dimtexture:true_offer_value_z)                                                0.72
+cor(feature_dimanimacy,feature_dimenvironment)                                           0.05
+cor(feature_dimanimacy,feature_dimsize)                                                 -0.01
+cor(feature_dimenvironment,feature_dimsize)                                              0.01
+cor(feature_dimanimacy,feature_dimtexture)                                               0.04
+cor(feature_dimenvironment,feature_dimtexture)                                           0.09
+cor(feature_dimsize,feature_dimtexture)                                                  0.03
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                            0.05
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                       -0.27
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                              -0.14
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                           -0.04
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                        0.01
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                   -0.17
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                          -0.17
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                       -0.05
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)     0.48
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                               0.05
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                          -0.14
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                 -0.17
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                              -0.04
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)            0.37
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)        0.35
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                           -0.01
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                       -0.06
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                              -0.19
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                            0.01
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)         0.46
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)     0.42
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)            0.50
+                                                                                     Est.Error
+sd(feature_dimanimacy)                                                                    0.13
+sd(feature_dimenvironment)                                                                0.16
+sd(feature_dimsize)                                                                       0.11
+sd(feature_dimtexture)                                                                    0.11
+sd(feature_dimanimacy:true_offer_value_z)                                                 0.22
+sd(feature_dimenvironment:true_offer_value_z)                                             0.20
+sd(feature_dimsize:true_offer_value_z)                                                    0.18
+sd(feature_dimtexture:true_offer_value_z)                                                 0.21
+cor(feature_dimanimacy,feature_dimenvironment)                                            0.32
+cor(feature_dimanimacy,feature_dimsize)                                                   0.32
+cor(feature_dimenvironment,feature_dimsize)                                               0.33
+cor(feature_dimanimacy,feature_dimtexture)                                                0.34
+cor(feature_dimenvironment,feature_dimtexture)                                            0.32
+cor(feature_dimsize,feature_dimtexture)                                                   0.33
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                             0.31
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                         0.28
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                                0.31
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                             0.31
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                         0.32
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                     0.29
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                            0.32
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                         0.32
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)      0.21
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                                0.33
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                            0.30
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                   0.32
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                                0.32
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)             0.25
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)         0.26
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                             0.32
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                         0.29
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                                0.32
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                             0.32
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)          0.21
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)      0.23
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)             0.24
+                                                                                     l-95% CI
+sd(feature_dimanimacy)                                                                   0.01
+sd(feature_dimenvironment)                                                               0.02
+sd(feature_dimsize)                                                                      0.01
+sd(feature_dimtexture)                                                                   0.01
+sd(feature_dimanimacy:true_offer_value_z)                                                0.51
+sd(feature_dimenvironment:true_offer_value_z)                                            0.35
+sd(feature_dimsize:true_offer_value_z)                                                   0.11
+sd(feature_dimtexture:true_offer_value_z)                                                0.35
+cor(feature_dimanimacy,feature_dimenvironment)                                          -0.58
+cor(feature_dimanimacy,feature_dimsize)                                                 -0.63
+cor(feature_dimenvironment,feature_dimsize)                                             -0.61
+cor(feature_dimanimacy,feature_dimtexture)                                              -0.63
+cor(feature_dimenvironment,feature_dimtexture)                                          -0.55
+cor(feature_dimsize,feature_dimtexture)                                                 -0.60
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                           -0.55
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                       -0.75
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                              -0.69
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                           -0.62
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                       -0.60
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                   -0.69
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                          -0.71
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                       -0.65
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)     0.02
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                              -0.60
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                          -0.69
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                 -0.72
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                              -0.64
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)           -0.18
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)       -0.22
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                           -0.61
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                       -0.61
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                              -0.73
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                           -0.59
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)         0.02
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)    -0.05
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)           -0.06
+                                                                                     u-95% CI
+sd(feature_dimanimacy)                                                                   0.48
+sd(feature_dimenvironment)                                                               0.62
+sd(feature_dimsize)                                                                      0.42
+sd(feature_dimtexture)                                                                   0.40
+sd(feature_dimanimacy:true_offer_value_z)                                                1.39
+sd(feature_dimenvironment:true_offer_value_z)                                            1.13
+sd(feature_dimsize:true_offer_value_z)                                                   0.86
+sd(feature_dimtexture:true_offer_value_z)                                                1.14
+cor(feature_dimanimacy,feature_dimenvironment)                                           0.64
+cor(feature_dimanimacy,feature_dimsize)                                                  0.63
+cor(feature_dimenvironment,feature_dimsize)                                              0.64
+cor(feature_dimanimacy,feature_dimtexture)                                               0.67
+cor(feature_dimenvironment,feature_dimtexture)                                           0.69
+cor(feature_dimsize,feature_dimtexture)                                                  0.65
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                            0.63
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                        0.34
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                               0.49
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                            0.55
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                        0.64
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                    0.45
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                           0.49
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                        0.59
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)     0.82
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                               0.67
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                           0.48
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                  0.52
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                               0.59
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)            0.79
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)        0.80
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                            0.61
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                        0.50
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                               0.49
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                            0.62
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)         0.80
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)     0.81
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)            0.86
+                                                                                     Rhat
+sd(feature_dimanimacy)                                                               1.01
+sd(feature_dimenvironment)                                                           1.00
+sd(feature_dimsize)                                                                  1.00
+sd(feature_dimtexture)                                                               1.00
+sd(feature_dimanimacy:true_offer_value_z)                                            1.00
+sd(feature_dimenvironment:true_offer_value_z)                                        1.00
+sd(feature_dimsize:true_offer_value_z)                                               1.00
+sd(feature_dimtexture:true_offer_value_z)                                            1.00
+cor(feature_dimanimacy,feature_dimenvironment)                                       1.00
+cor(feature_dimanimacy,feature_dimsize)                                              1.00
+cor(feature_dimenvironment,feature_dimsize)                                          1.00
+cor(feature_dimanimacy,feature_dimtexture)                                           1.00
+cor(feature_dimenvironment,feature_dimtexture)                                       1.00
+cor(feature_dimsize,feature_dimtexture)                                              1.00
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                        1.01
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                    1.00
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                           1.00
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                        1.00
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                    1.00
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                1.00
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                       1.00
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                    1.00
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z) 1.00
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                           1.00
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                       1.00
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                              1.00
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                           1.00
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)        1.00
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)    1.00
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                        1.00
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                    1.01
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                           1.01
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                        1.00
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)     1.00
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z) 1.00
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)        1.00
+                                                                                     Bulk_ESS
+sd(feature_dimanimacy)                                                                   1068
+sd(feature_dimenvironment)                                                                902
+sd(feature_dimsize)                                                                      1112
+sd(feature_dimtexture)                                                                   2049
+sd(feature_dimanimacy:true_offer_value_z)                                                2041
+sd(feature_dimenvironment:true_offer_value_z)                                            1804
+sd(feature_dimsize:true_offer_value_z)                                                   1793
+sd(feature_dimtexture:true_offer_value_z)                                                2080
+cor(feature_dimanimacy,feature_dimenvironment)                                           2021
+cor(feature_dimanimacy,feature_dimsize)                                                  2977
+cor(feature_dimenvironment,feature_dimsize)                                              4526
+cor(feature_dimanimacy,feature_dimtexture)                                               4861
+cor(feature_dimenvironment,feature_dimtexture)                                           4259
+cor(feature_dimsize,feature_dimtexture)                                                  3494
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                             850
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                         864
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                                767
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                            1261
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                         931
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                    1323
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                            918
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                        1332
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)     2772
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                               1021
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                           1612
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                  1085
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                               1420
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)            3620
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)        2759
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                             773
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                         948
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                                789
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                            1111
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)         2820
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)     2662
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)            2071
+                                                                                     Tail_ESS
+sd(feature_dimanimacy)                                                                    842
+sd(feature_dimenvironment)                                                               1096
+sd(feature_dimsize)                                                                      1817
+sd(feature_dimtexture)                                                                   2197
+sd(feature_dimanimacy:true_offer_value_z)                                                2924
+sd(feature_dimenvironment:true_offer_value_z)                                            2414
+sd(feature_dimsize:true_offer_value_z)                                                   1452
+sd(feature_dimtexture:true_offer_value_z)                                                1778
+cor(feature_dimanimacy,feature_dimenvironment)                                           2591
+cor(feature_dimanimacy,feature_dimsize)                                                  2685
+cor(feature_dimenvironment,feature_dimsize)                                              3114
+cor(feature_dimanimacy,feature_dimtexture)                                               2809
+cor(feature_dimenvironment,feature_dimtexture)                                           3485
+cor(feature_dimsize,feature_dimtexture)                                                  3065
+cor(feature_dimanimacy,feature_dimanimacy:true_offer_value_z)                            1612
+cor(feature_dimenvironment,feature_dimanimacy:true_offer_value_z)                        1295
+cor(feature_dimsize,feature_dimanimacy:true_offer_value_z)                               1613
+cor(feature_dimtexture,feature_dimanimacy:true_offer_value_z)                            2480
+cor(feature_dimanimacy,feature_dimenvironment:true_offer_value_z)                        1703
+cor(feature_dimenvironment,feature_dimenvironment:true_offer_value_z)                    2183
+cor(feature_dimsize,feature_dimenvironment:true_offer_value_z)                           2018
+cor(feature_dimtexture,feature_dimenvironment:true_offer_value_z)                        1701
+cor(feature_dimanimacy:true_offer_value_z,feature_dimenvironment:true_offer_value_z)     3395
+cor(feature_dimanimacy,feature_dimsize:true_offer_value_z)                               1715
+cor(feature_dimenvironment,feature_dimsize:true_offer_value_z)                           1720
+cor(feature_dimsize,feature_dimsize:true_offer_value_z)                                  2465
+cor(feature_dimtexture,feature_dimsize:true_offer_value_z)                               2788
+cor(feature_dimanimacy:true_offer_value_z,feature_dimsize:true_offer_value_z)            3626
+cor(feature_dimenvironment:true_offer_value_z,feature_dimsize:true_offer_value_z)        3079
+cor(feature_dimanimacy,feature_dimtexture:true_offer_value_z)                            1684
+cor(feature_dimenvironment,feature_dimtexture:true_offer_value_z)                        1516
+cor(feature_dimsize,feature_dimtexture:true_offer_value_z)                               1630
+cor(feature_dimtexture,feature_dimtexture:true_offer_value_z)                            2409
+cor(feature_dimanimacy:true_offer_value_z,feature_dimtexture:true_offer_value_z)         3528
+cor(feature_dimenvironment:true_offer_value_z,feature_dimtexture:true_offer_value_z)     3388
+cor(feature_dimsize:true_offer_value_z,feature_dimtexture:true_offer_value_z)            2280
+
+Regression Coefficients:
+                                          Estimate Est.Error l-95% CI u-95% CI
+feature_dimanimacy                            0.23      0.10     0.04     0.43
+feature_dimenvironment                        0.20      0.10    -0.00     0.41
+feature_dimsize                               0.08      0.10    -0.10     0.29
+feature_dimtexture                            0.24      0.10     0.06     0.44
+feature_dimanimacy:true_offer_value_z         1.25      0.22     0.86     1.70
+feature_dimenvironment:true_offer_value_z     0.97      0.17     0.66     1.34
+feature_dimsize:true_offer_value_z            0.88      0.15     0.60     1.19
+feature_dimtexture:true_offer_value_z         0.94      0.18     0.63     1.32
+                                          Rhat Bulk_ESS Tail_ESS
+feature_dimanimacy                        1.00     3869     2862
+feature_dimenvironment                    1.00     3750     2815
+feature_dimsize                           1.00     6292     2727
+feature_dimtexture                        1.00     5323     2991
+feature_dimanimacy:true_offer_value_z     1.00     2487     2283
+feature_dimenvironment:true_offer_value_z 1.00     2479     2495
+feature_dimsize:true_offer_value_z        1.00     3263     2844
+feature_dimtexture:true_offer_value_z     1.00     3018     2985
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

@@ -1,0 +1,30 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: delta_relevant ~ 1 + game_c + (1 + game_c | subject) 
+   Data: d_eye_rel (Number of observations: 1999) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 41) 
+                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+sd(Intercept)             0.07      0.01     0.05     0.09 1.00     1610
+sd(game_c)                0.01      0.00     0.00     0.02 1.00     1943
+cor(Intercept,game_c)     0.34      0.50    -0.82     0.98 1.00     3781
+                      Tail_ESS
+sd(Intercept)             2304
+sd(game_c)                2049
+cor(Intercept,game_c)     2286
+
+Regression Coefficients:
+          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept     0.07      0.01     0.05     0.10 1.00     1975     2121
+game_c       -0.00      0.00    -0.01     0.01 1.00     4793     2508
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.31      0.00     0.30     0.32 1.00     5786     2789
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

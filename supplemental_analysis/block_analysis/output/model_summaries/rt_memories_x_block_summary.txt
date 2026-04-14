@@ -1,0 +1,62 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: log_rt ~ 1 + recalled_total_count * game_c + (1 + recalled_total_count * game_c | subject) 
+   Data: d_choices (Number of observations: 2359) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 43) 
+                                                      Estimate Est.Error
+sd(Intercept)                                             1.20      0.23
+sd(recalled_total_count)                                  0.20      0.05
+sd(game_c)                                                0.21      0.10
+sd(recalled_total_count:game_c)                           0.02      0.02
+cor(Intercept,recalled_total_count)                      -0.79      0.12
+cor(Intercept,game_c)                                     0.05      0.24
+cor(recalled_total_count,game_c)                          0.14      0.26
+cor(Intercept,recalled_total_count:game_c)                0.03      0.38
+cor(recalled_total_count,recalled_total_count:game_c)    -0.10      0.38
+cor(game_c,recalled_total_count:game_c)                  -0.62      0.41
+                                                      l-95% CI u-95% CI Rhat
+sd(Intercept)                                             0.78     1.69 1.01
+sd(recalled_total_count)                                  0.10     0.30 1.01
+sd(game_c)                                                0.09     0.44 1.01
+sd(recalled_total_count:game_c)                           0.00     0.07 1.02
+cor(Intercept,recalled_total_count)                      -0.93    -0.49 1.01
+cor(Intercept,game_c)                                    -0.42     0.50 1.00
+cor(recalled_total_count,game_c)                         -0.35     0.62 1.00
+cor(Intercept,recalled_total_count:game_c)               -0.71     0.75 1.00
+cor(recalled_total_count,recalled_total_count:game_c)    -0.76     0.70 1.00
+cor(game_c,recalled_total_count:game_c)                  -0.98     0.46 1.01
+                                                      Bulk_ESS Tail_ESS
+sd(Intercept)                                              883     1605
+sd(recalled_total_count)                                   521      938
+sd(game_c)                                                 529     1166
+sd(recalled_total_count:game_c)                            354      853
+cor(Intercept,recalled_total_count)                        739     1385
+cor(Intercept,game_c)                                     1745     2330
+cor(recalled_total_count,game_c)                          1256     2096
+cor(Intercept,recalled_total_count:game_c)                2763     2304
+cor(recalled_total_count,recalled_total_count:game_c)     2446     2316
+cor(game_c,recalled_total_count:game_c)                    666     1626
+
+Regression Coefficients:
+                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+Intercept                       0.90      0.23     0.43     1.35 1.00     1292
+recalled_total_count            0.15      0.04     0.07     0.24 1.00     1439
+game_c                         -0.07      0.07    -0.20     0.08 1.00     2153
+recalled_total_count:game_c     0.01      0.01    -0.02     0.03 1.00     2506
+                            Tail_ESS
+Intercept                       1941
+recalled_total_count            1932
+game_c                          2389
+recalled_total_count:game_c     2637
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.89      0.01     0.87     0.92 1.00     4090     2678
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

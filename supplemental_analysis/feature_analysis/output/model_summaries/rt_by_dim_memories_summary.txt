@@ -1,0 +1,296 @@
+ Family: gaussian 
+  Links: mu = identity 
+Formula: log_rt ~ 0 + feature_dim + feature_dim:recalled_total_count + (0 + feature_dim + feature_dim:recalled_total_count | subject) 
+   Data: d_a1 (Number of observations: 2408) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Multilevel Hyperparameters:
+~subject (Number of levels: 43) 
+                                                                                         Estimate
+sd(feature_dimanimacy)                                                                       0.39
+sd(feature_dimenvironment)                                                                   0.60
+sd(feature_dimsize)                                                                          0.53
+sd(feature_dimtexture)                                                                       0.52
+sd(feature_dimanimacy:recalled_total_count)                                                  0.07
+sd(feature_dimenvironment:recalled_total_count)                                              0.05
+sd(feature_dimsize:recalled_total_count)                                                     0.10
+sd(feature_dimtexture:recalled_total_count)                                                  0.10
+cor(feature_dimanimacy,feature_dimenvironment)                                               0.57
+cor(feature_dimanimacy,feature_dimsize)                                                      0.50
+cor(feature_dimenvironment,feature_dimsize)                                                  0.62
+cor(feature_dimanimacy,feature_dimtexture)                                                   0.48
+cor(feature_dimenvironment,feature_dimtexture)                                               0.61
+cor(feature_dimsize,feature_dimtexture)                                                      0.50
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                             -0.09
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                          0.45
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                 0.26
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                              0.27
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                         -0.01
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                     -0.15
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                            -0.00
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                          0.04
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)     0.17
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                 0.25
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                             0.43
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                   -0.07
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                 0.32
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)            0.41
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)        0.19
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                              0.27
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                          0.47
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                 0.27
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                             -0.02
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)         0.42
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)     0.17
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)            0.43
+                                                                                         Est.Error
+sd(feature_dimanimacy)                                                                        0.15
+sd(feature_dimenvironment)                                                                    0.11
+sd(feature_dimsize)                                                                           0.17
+sd(feature_dimtexture)                                                                        0.18
+sd(feature_dimanimacy:recalled_total_count)                                                   0.03
+sd(feature_dimenvironment:recalled_total_count)                                               0.03
+sd(feature_dimsize:recalled_total_count)                                                      0.04
+sd(feature_dimtexture:recalled_total_count)                                                   0.04
+cor(feature_dimanimacy,feature_dimenvironment)                                                0.26
+cor(feature_dimanimacy,feature_dimsize)                                                       0.27
+cor(feature_dimenvironment,feature_dimsize)                                                   0.22
+cor(feature_dimanimacy,feature_dimtexture)                                                    0.28
+cor(feature_dimenvironment,feature_dimtexture)                                                0.23
+cor(feature_dimsize,feature_dimtexture)                                                       0.26
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                               0.34
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                           0.30
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                  0.34
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                               0.33
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                           0.33
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                       0.33
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                              0.33
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                           0.33
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)      0.32
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                  0.34
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                              0.29
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                     0.33
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                  0.31
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)             0.29
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)         0.33
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                               0.34
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                           0.29
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                  0.33
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                               0.32
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)          0.30
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)      0.33
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)             0.29
+                                                                                         l-95% CI
+sd(feature_dimanimacy)                                                                       0.07
+sd(feature_dimenvironment)                                                                   0.41
+sd(feature_dimsize)                                                                          0.20
+sd(feature_dimtexture)                                                                       0.13
+sd(feature_dimanimacy:recalled_total_count)                                                  0.01
+sd(feature_dimenvironment:recalled_total_count)                                              0.00
+sd(feature_dimsize:recalled_total_count)                                                     0.02
+sd(feature_dimtexture:recalled_total_count)                                                  0.01
+cor(feature_dimanimacy,feature_dimenvironment)                                              -0.08
+cor(feature_dimanimacy,feature_dimsize)                                                     -0.16
+cor(feature_dimenvironment,feature_dimsize)                                                  0.10
+cor(feature_dimanimacy,feature_dimtexture)                                                  -0.21
+cor(feature_dimenvironment,feature_dimtexture)                                               0.07
+cor(feature_dimsize,feature_dimtexture)                                                     -0.11
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                             -0.68
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                         -0.25
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                -0.47
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                             -0.44
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                         -0.63
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                     -0.72
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                            -0.62
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                         -0.60
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)    -0.49
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                -0.49
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                            -0.23
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                   -0.65
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                -0.36
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)           -0.25
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)       -0.47
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                             -0.46
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                         -0.22
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                -0.42
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                             -0.61
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)        -0.29
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)    -0.51
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)           -0.24
+                                                                                         u-95% CI
+sd(feature_dimanimacy)                                                                       0.67
+sd(feature_dimenvironment)                                                                   0.83
+sd(feature_dimsize)                                                                          0.86
+sd(feature_dimtexture)                                                                       0.85
+sd(feature_dimanimacy:recalled_total_count)                                                  0.14
+sd(feature_dimenvironment:recalled_total_count)                                              0.12
+sd(feature_dimsize:recalled_total_count)                                                     0.17
+sd(feature_dimtexture:recalled_total_count)                                                  0.17
+cor(feature_dimanimacy,feature_dimenvironment)                                               0.91
+cor(feature_dimanimacy,feature_dimsize)                                                      0.89
+cor(feature_dimenvironment,feature_dimsize)                                                  0.92
+cor(feature_dimanimacy,feature_dimtexture)                                                   0.88
+cor(feature_dimenvironment,feature_dimtexture)                                               0.93
+cor(feature_dimsize,feature_dimtexture)                                                      0.87
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                              0.57
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                          0.90
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                 0.83
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                              0.82
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                          0.62
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                      0.51
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                             0.63
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                          0.65
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)     0.73
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                 0.80
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                             0.88
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                    0.58
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                 0.83
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)            0.85
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)        0.74
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                              0.83
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                          0.90
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                 0.82
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                              0.59
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)         0.86
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)     0.75
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)            0.86
+                                                                                         Rhat
+sd(feature_dimanimacy)                                                                   1.00
+sd(feature_dimenvironment)                                                               1.00
+sd(feature_dimsize)                                                                      1.00
+sd(feature_dimtexture)                                                                   1.01
+sd(feature_dimanimacy:recalled_total_count)                                              1.02
+sd(feature_dimenvironment:recalled_total_count)                                          1.02
+sd(feature_dimsize:recalled_total_count)                                                 1.00
+sd(feature_dimtexture:recalled_total_count)                                              1.00
+cor(feature_dimanimacy,feature_dimenvironment)                                           1.01
+cor(feature_dimanimacy,feature_dimsize)                                                  1.00
+cor(feature_dimenvironment,feature_dimsize)                                              1.01
+cor(feature_dimanimacy,feature_dimtexture)                                               1.00
+cor(feature_dimenvironment,feature_dimtexture)                                           1.00
+cor(feature_dimsize,feature_dimtexture)                                                  1.00
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                          1.00
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                      1.01
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                             1.01
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                          1.01
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                      1.00
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                  1.00
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                         1.00
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                      1.00
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count) 1.00
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                             1.01
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                         1.00
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                1.00
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                             1.00
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)        1.00
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)    1.00
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                          1.01
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                      1.00
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                             1.00
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                          1.00
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)     1.00
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count) 1.00
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)        1.00
+                                                                                         Bulk_ESS
+sd(feature_dimanimacy)                                                                       1092
+sd(feature_dimenvironment)                                                                   1858
+sd(feature_dimsize)                                                                          1349
+sd(feature_dimtexture)                                                                       1045
+sd(feature_dimanimacy:recalled_total_count)                                                   189
+sd(feature_dimenvironment:recalled_total_count)                                               286
+sd(feature_dimsize:recalled_total_count)                                                      790
+sd(feature_dimtexture:recalled_total_count)                                                   714
+cor(feature_dimanimacy,feature_dimenvironment)                                                307
+cor(feature_dimanimacy,feature_dimsize)                                                       799
+cor(feature_dimenvironment,feature_dimsize)                                                  1443
+cor(feature_dimanimacy,feature_dimtexture)                                                    642
+cor(feature_dimenvironment,feature_dimtexture)                                               1260
+cor(feature_dimsize,feature_dimtexture)                                                      1389
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                               895
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                           662
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                 1010
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                               994
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                          2190
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                      1212
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                             1749
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                          2645
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)     1953
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                  453
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                             1316
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                    1816
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                 1730
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)            1119
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)        1635
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                               474
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                          1047
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                 1719
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                              2382
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)         1214
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)     1709
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)            1243
+                                                                                         Tail_ESS
+sd(feature_dimanimacy)                                                                        741
+sd(feature_dimenvironment)                                                                   1991
+sd(feature_dimsize)                                                                          1082
+sd(feature_dimtexture)                                                                        802
+sd(feature_dimanimacy:recalled_total_count)                                                   665
+sd(feature_dimenvironment:recalled_total_count)                                              1027
+sd(feature_dimsize:recalled_total_count)                                                      838
+sd(feature_dimtexture:recalled_total_count)                                                   606
+cor(feature_dimanimacy,feature_dimenvironment)                                                521
+cor(feature_dimanimacy,feature_dimsize)                                                      1086
+cor(feature_dimenvironment,feature_dimsize)                                                  1757
+cor(feature_dimanimacy,feature_dimtexture)                                                   1094
+cor(feature_dimenvironment,feature_dimtexture)                                               1785
+cor(feature_dimsize,feature_dimtexture)                                                      1661
+cor(feature_dimanimacy,feature_dimanimacy:recalled_total_count)                              1845
+cor(feature_dimenvironment,feature_dimanimacy:recalled_total_count)                          1314
+cor(feature_dimsize,feature_dimanimacy:recalled_total_count)                                 1562
+cor(feature_dimtexture,feature_dimanimacy:recalled_total_count)                              1889
+cor(feature_dimanimacy,feature_dimenvironment:recalled_total_count)                          2501
+cor(feature_dimenvironment,feature_dimenvironment:recalled_total_count)                      2745
+cor(feature_dimsize,feature_dimenvironment:recalled_total_count)                             2504
+cor(feature_dimtexture,feature_dimenvironment:recalled_total_count)                          3365
+cor(feature_dimanimacy:recalled_total_count,feature_dimenvironment:recalled_total_count)     2610
+cor(feature_dimanimacy,feature_dimsize:recalled_total_count)                                 1245
+cor(feature_dimenvironment,feature_dimsize:recalled_total_count)                             1326
+cor(feature_dimsize,feature_dimsize:recalled_total_count)                                    2571
+cor(feature_dimtexture,feature_dimsize:recalled_total_count)                                 2573
+cor(feature_dimanimacy:recalled_total_count,feature_dimsize:recalled_total_count)            2150
+cor(feature_dimenvironment:recalled_total_count,feature_dimsize:recalled_total_count)        2882
+cor(feature_dimanimacy,feature_dimtexture:recalled_total_count)                              1261
+cor(feature_dimenvironment,feature_dimtexture:recalled_total_count)                          1613
+cor(feature_dimsize,feature_dimtexture:recalled_total_count)                                 2507
+cor(feature_dimtexture,feature_dimtexture:recalled_total_count)                              2556
+cor(feature_dimanimacy:recalled_total_count,feature_dimtexture:recalled_total_count)         1931
+cor(feature_dimenvironment:recalled_total_count,feature_dimtexture:recalled_total_count)     2671
+cor(feature_dimsize:recalled_total_count,feature_dimtexture:recalled_total_count)            1830
+
+Regression Coefficients:
+                                            Estimate Est.Error l-95% CI
+feature_dimanimacy                              1.10      0.18     0.75
+feature_dimenvironment                          0.72      0.20     0.32
+feature_dimsize                                 1.17      0.20     0.78
+feature_dimtexture                              1.30      0.20     0.90
+feature_dimanimacy:recalled_total_count         0.11      0.04     0.04
+feature_dimenvironment:recalled_total_count     0.18      0.04     0.11
+feature_dimsize:recalled_total_count            0.10      0.04     0.02
+feature_dimtexture:recalled_total_count         0.07      0.04    -0.01
+                                            u-95% CI Rhat Bulk_ESS Tail_ESS
+feature_dimanimacy                              1.45 1.00     2869     3088
+feature_dimenvironment                          1.10 1.00     2542     2985
+feature_dimsize                                 1.56 1.00     2846     2859
+feature_dimtexture                              1.69 1.00     2677     2780
+feature_dimanimacy:recalled_total_count         0.19 1.00     3280     3240
+feature_dimenvironment:recalled_total_count     0.26 1.00     3272     3303
+feature_dimsize:recalled_total_count            0.18 1.00     3347     2747
+feature_dimtexture:recalled_total_count         0.16 1.00     3116     3039
+
+Further Distributional Parameters:
+      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+sigma     0.93      0.01     0.90     0.96 1.00     5452     3177
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).

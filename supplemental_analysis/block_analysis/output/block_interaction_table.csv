@@ -1,0 +1,10 @@
+analysis,term,estimate,hdi_low,hdi_high,hdi_spans_zero
+Accuracy x block,game_c,0.0167128425607354,-0.0369538455078002,0.0708923758541075,True
+RT ~ number of memories x block,recalled_total_count:game_c,0.0072444316062006,-0.0201351064873237,0.0319138070559116,True
+Choice ~ recalled offer value x block,recalled_offer_value_z:game_c,0.0262211930463952,-0.0938896250556372,0.1517561742584269,True
+RT ~ (recalled offer value)^2 x block,recalled_offer_value_z2:game_c,0.0048814448783094,-0.0113800567220333,0.0210833498403737,True
+Relevant fixation prop. x block,game_c,-0.0008129195847748559,-0.0079354912226359,0.0066462842032841,True
+Fixation prop. ~ choice x valence x block,decision_c:valence_c:game_c,0.0125889281043605,-0.0100309184999417,0.0345225407188667,True
+Item recall proportion x block,game_c,0.004871797155774,-0.005517323687855,0.0150956698873712,True
+True ~ recalled reward x block,recalled_value:game_c,-0.0089946709299591,-0.0290538833486682,0.0112106894524513,True
+Location recall x block,game_c,0.2020362918055756,-0.1368032784237725,0.672496999981415,True
