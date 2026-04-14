@@ -70,7 +70,7 @@ ncm2026_optimalepisodic/
 │       ├── argument.py                #     Argument parsing and serialization
 │       └── utils.py                   #     Miscellaneous utilities
 │
-├── metarnn/                           # Neural network model comparisons
+├── metarnn/                           # RNN model comparisons
 │   ├── run_nn_pipeline.sh             #   Pipeline: process NNs -> compare -> Bayesian stats
 │   ├── create_nn_figures.sh           #   Sub-pipeline: JSON simulations -> human-like CSVs + figures
 │   ├── plot_NN_NN_comparison.py       #   Compare two NN variants (Figure 4)
@@ -102,7 +102,7 @@ ncm2026_optimalepisodic/
 │
 ├── output/                            # All analysis results
 │   ├── figures/                       #   Manuscript figures (Figures 1-5)
-│   │   └── supplementary/            #   Supplementary figures (Figures S2-S6)
+│   │   └── supplementary/            #   Supplementary figures (Figures S2-S7)
 │   ├── behavior/                      #   Behavioral results
 │   │   ├── Figure1.pdf                #     Figure 1
 │   │   ├── FigureS2.pdf               #     Figure S2
@@ -119,6 +119,15 @@ ncm2026_optimalepisodic/
 │   │   └── parameter_recovery_sweep/  #     Recovery analysis results
 │   └── next_fixation_gen/             #   Human fixation generation analysis cache
 │
+├── feature_analysis/                  # Per-feature-dimension robustness check
+│   ├── run_feature_analyses.sh        #   Pipeline: data -> 8 brms fits -> FigureS7
+│   ├── scripts/                       #   build, compute, plot scripts
+│   ├── data/                          #   Intermediate per-trial CSVs
+│   └── output/
+│       ├── FigureS7.pdf               #     Figure S7 (also copied to output/figures/supplementary/)
+│       ├── feature_deviation_from_mean.csv
+│       └── model_summaries/
+│
 ├── task/
 │   └── emdm-eyetracking/
 │       └── game_info/                 #     Trial configurations (items, rewards, sequences)
@@ -131,7 +140,7 @@ ncm2026_optimalepisodic/
 
 ## Pipelines
 
-There are four analysis pipelines, each orchestrated by a top-level shell script. All scripts assume they are run from the repository root with the `analysis` conda environment active.
+There are six analysis pipelines, each orchestrated by a top-level shell script. All scripts assume they are run from the repository root with the `analysis` conda environment active.
 
 ### 1. Behavioral Analysis (`analysis/run_behavior.sh`)
 
@@ -236,6 +245,19 @@ create_nn_figures.sh (input0 baseline)
 
 **Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
 
+### 6. Feature-dimension robustness (`feature_analysis/run_feature_analyses.sh`)
+
+Fits per-feature-dimension reparameterizations of eight analyses from Pipelines 1 and 2 and produces Figure S7, summarising how each effect varies across the four feature dimensions.
+
+```
+build_choices.py
+  --> build_eye_fixation.py
+  --> compute_feature_stats.R   (8 brms fits; ~30-40 min)
+  --> plot_feature_deviation.py (FigureS7.pdf)
+```
+
+**Outputs:** `feature_analysis/output/FigureS7.pdf`, `feature_analysis/output/feature_deviation_from_mean.csv`, `feature_analysis/output/model_summaries/*.{txt,csv}`, `output/figures/supplementary/FigureS7.pdf`
+
 ---
 
 ## Sample
@@ -262,7 +284,7 @@ install.packages(c("brms", "readr", "dplyr", "tidyr", "broom.mixed"))
 
 ### Reproducing Results
 
-Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`.
+Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`. Pipeline 6 (feature-dimension robustness) depends on the same eye-tracking CSV produced by Pipeline 2.
 
 Pre-computed outputs are included in `output/` and `metarnn/simulations/human_like_*/output/`, so results can be inspected without re-running.
 
@@ -281,6 +303,9 @@ bash addm/run_addm.sh rtTrans
 
 # Pipeline 4: NN comparisons (comparing input0 vs input5)
 bash metarnn/run_nn_pipeline.sh 04_04 5
+
+# Pipeline 6: Feature-dimension robustness
+bash feature_analysis/run_feature_analyses.sh
 ```
 
 ### Notes
@@ -308,6 +333,7 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 | Figure S4 | Fixation drop supplement | `metarnn/lib/plot_prop_drop_supplement.py` |
 | Figure S5 | Transition supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S6 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
+| Figure S7 | Per-feature-dimension robustness | `feature_analysis/scripts/plot_feature_deviation.py` |
 
 ---
 
