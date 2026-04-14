@@ -120,7 +120,7 @@ ncm2026_optimalepisodic/
 │   └── next_fixation_gen/             #   Human fixation generation analysis cache
 │
 ├── feature_analysis/                  # Per-feature-dimension robustness check
-│   ├── run_feature_analyses.sh        #   Pipeline: data -> 8 brms fits -> FigureS7
+│   ├── run_feature_analysis.sh        #   Pipeline: data -> 8 brms fits -> FigureS7
 │   ├── scripts/                       #   build, compute, plot scripts
 │   ├── data/                          #   Intermediate per-trial CSVs
 │   └── output/
@@ -245,7 +245,7 @@ create_nn_figures.sh (input0 baseline)
 
 **Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
 
-### 6. Feature-dimension robustness (`feature_analysis/run_feature_analyses.sh`)
+### 6. Feature-dimension robustness (`feature_analysis/run_feature_analysis.sh`)
 
 Fits per-feature-dimension reparameterizations of eight analyses from Pipelines 1 and 2 and produces Figure S7, summarising how each effect varies across the four feature dimensions.
 
@@ -305,7 +305,7 @@ bash addm/run_addm.sh rtTrans
 bash metarnn/run_nn_pipeline.sh 04_04 5
 
 # Pipeline 6: Feature-dimension robustness
-bash feature_analysis/run_feature_analyses.sh
+bash feature_analysis/run_feature_analysis.sh
 ```
 
 ### Notes

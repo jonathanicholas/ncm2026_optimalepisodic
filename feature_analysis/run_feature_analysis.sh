@@ -6,7 +6,7 @@
 #   4. Render FigureS7.pdf from the deviation CSV.
 #
 # Assumes the `analysis` conda env is available.
-# Usage: ./run_feature_analyses.sh
+# Usage: ./run_feature_analysis.sh
 
 set -euo pipefail
 
