@@ -268,7 +268,7 @@ build_choices.py
 
 ### 7. Block-number (round) robustness (`supplemental_analysis/block_analysis/run_block_analysis.sh`)
 
-Refits each headline effect from Pipelines 1 and 2 with an added block-number (round) interaction as both a fixed effect and a by-subject random slope, plus three memory-performance checks (item recall, value recall fidelity, location recall). Produces Table S8, a 9-row summary of interaction coefficients and 95% HDIs.
+Refits effects from Pipelines 1 and 2 with an added block-number (round) interaction as both a fixed effect and a by-subject random slope, plus three memory-performance checks (item recall, value recall fidelity, location recall). Produces Table S8, a 9-row summary of interaction coefficients and 95% HDIs.
 
 ```
 build_choices.py
@@ -357,7 +357,6 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 | Figure S5 | Transition supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S6 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S7 | Per-feature-dimension robustness | `supplemental_analysis/feature_analysis/scripts/plot_feature_deviation.py` |
-| Table S8 | Block-number (round) interaction tests | `supplemental_analysis/block_analysis/scripts/compute_block_stats.R` |
 
 ---
 
