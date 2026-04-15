@@ -49,7 +49,7 @@ ncm2026_optimalepisodic/
 │       ├── generative_gaze.py         #     Generate synthetic fixation sequences from empirical stats
 │       ├── prepare_fixations_for_modeling.py  # Preprocess raw fixations for model input
 │       ├── run_kfold_cv.py            #     K-fold cross-validation framework
-│       └── parameter_recovery_sweep.py #    Systematic parameter recovery (500 combos)
+│       └── parameter_recovery_sweep.py #    Systematic parameter recovery (1000 combos)
 │
 ├── training/                          # RNN training pipeline
 │   ├── run_train.sh                   #   SLURM: train network (jobid 0-9, one seed per job)
