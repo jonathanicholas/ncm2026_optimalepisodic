@@ -113,9 +113,44 @@ conda run -n analysis Rscript metarnn/run_mixed_effects_next_fixation_gen.R \
   --nn-root "${OUTN}" \
   --tag "${TAGN}"
 
-# ── Step 10: Copy figures to output/figures/ ─────────────────────────────────
+# ── Step 10: Evidence accumulation + belief decoding figure ──────────────────
 echo ""
-echo "[STEP 10/10] Copy figures to output/figures/"
+echo "[STEP 10/11] Evidence accumulation + belief decoding figure"
+EVIDENCE_DIR="${OUT0}/output/evidence"
+HIDDEN_DIR="${SIM_DIR0}/with_hidden"
+DECODING_CSV="${EVIDENCE_DIR}/belief_decoding_results.csv"
+
+mkdir -p "${EVIDENCE_DIR}"
+
+# Run decoding if CSV doesn't exist and hidden-state JSONs are available
+if [ ! -f "${DECODING_CSV}" ] && [ -d "${HIDDEN_DIR}" ]; then
+  echo "  Running belief decoding..."
+  conda run -n analysis python metarnn/lib/run_belief_decoding.py \
+    --data-dir "${HIDDEN_DIR}" --out-dir "${EVIDENCE_DIR}" \
+    --prefix data_0 --seeds 5 6 7 8 9 --workers 5
+elif [ -f "${DECODING_CSV}" ]; then
+  echo "  SKIP decoding — cached CSV exists: ${DECODING_CSV}"
+else
+  echo "  SKIP decoding — no hidden-state JSONs and no cached CSV"
+fi
+
+# Generate figure (from JSONs if available, otherwise from cache)
+if [ -d "${HIDDEN_DIR}" ]; then
+  conda run -n analysis python metarnn/lib/plot_evidence_figure.py \
+    --data-dir "${HIDDEN_DIR}" --out-dir "${EVIDENCE_DIR}" \
+    --prefix data_0 --seeds 5 6 7 8 9 \
+    --decoding-csv "${DECODING_CSV}" --save-cache
+elif [ -f "${EVIDENCE_DIR}/evidence_figure_cache.csv" ]; then
+  conda run -n analysis python metarnn/lib/plot_evidence_figure.py \
+    --cache-dir "${EVIDENCE_DIR}" --out-dir "${EVIDENCE_DIR}" \
+    --decoding-csv "${DECODING_CSV}"
+else
+  echo "  SKIP evidence figure — no data available"
+fi
+
+# ── Step 11: Copy figures to output/figures/ ─────────────────────────────────
+echo ""
+echo "[STEP 11/11] Copy figures to output/figures/"
 mkdir -p output/figures/supplementary
 
 cp "${OUTN}/output/overview/FigureNN_overview_${TAGN}.pdf" \
@@ -131,9 +166,14 @@ cp "${OUTN}/output/next_fixation_gen/FigureTransitionSupplement_${TAGN}.pdf" \
 cp "${OUTN}/output/next_fixation_gen/FigureAdvantageSupplement_${TAGN}.pdf" \
    output/figures/supplementary/FigureS6.pdf
 
+if [ -f "${OUT0}/output/evidence/evidence_figure.pdf" ]; then
+  cp "${OUT0}/output/evidence/evidence_figure.pdf" \
+     output/figures/Figure3BC.pdf
+fi
+
 echo ""
 echo "============================================================"
-echo "[DONE] NN pipeline complete for ${SIM_NAME} (input0 vs input${NINPUTS}) [10 steps]"
+echo "[DONE] NN pipeline complete for ${SIM_NAME} (input0 vs input${NINPUTS}) [11 steps]"
 echo "[DONE] Outputs: ${OUTN}/output/"
 echo "[DONE] Figures: output/figures/"
 echo "============================================================"

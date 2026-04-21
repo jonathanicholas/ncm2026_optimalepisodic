@@ -86,11 +86,15 @@ ncm2026_optimalepisodic/
 │   │   ├── plot_NN_H_comparison.py    #     Direct human-NN comparison plots
 │   │   ├── plot_NN_sweep_transitions.py  #  Fixation transition patterns
 │   │   ├── plot_prop_drop_supplement.py  #  Fixation drop fraction supplement (Figure S4)
-│   │   └── export_nn_nn_comparison_data.py  # Export data for R statistical analysis
+│   │   ├── export_nn_nn_comparison_data.py  # Export data for R statistical analysis
+│   │   ├── plot_evidence_figure.py    #     Evidence accumulation + decoding figure (Figure 3BC)
+│   │   └── run_belief_decoding.py     #     Decode belief states from hidden states (MLP + Ridge)
 │   └── simulations/                   #   NN simulation data
 │       ├── simulation_04_04_input0/   #     Raw JSON simulations (baseline NN, no episodic input)
+│       │   └── with_hidden/           #       JSON files with hidden states + logits (gitignored)
 │       ├── simulation_04_04_input5/   #     Raw JSON simulations (episodic-input NN)
 │       ├── human_like_04_04_input0/   #     Processed baseline: human-format CSVs + outputs
+│       │   └── output/evidence/       #       Evidence accumulation + belief decoding outputs
 │       └── human_like_04_04_input5/   #     Processed episodic-input: human-format CSVs + outputs
 │
 ├── data/                              # Raw participant data (43 subjects: 101-150)
@@ -249,9 +253,9 @@ create_nn_figures.sh (input0 baseline)
   --> copy figures to output/figures/
 ```
 
-`create_nn_figures.sh` internally runs: JSON compilation, fixation preparation, choice fixation proportions, choice prediction (with recall-calibrated drop), prop-drop supplement, NN overview, and human-NN comparison figures.
+`create_nn_figures.sh` internally runs: JSON compilation, fixation preparation, choice fixation proportions, choice prediction (with recall-calibrated drop), prop-drop supplement, NN overview, and human-NN comparison figures. The pipeline also runs belief decoding (decoding metalevel MDP belief states from the network's hidden states via MLP) and generates the evidence accumulation figure (Figure 3, panels B-C) if simulation files with hidden states are available in `simulation_*/with_hidden/`. Pre-computed outputs are cached so the figure can be regenerated without the large JSON files.
 
-**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
+**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/Figure3BC.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
 
 ### 6. Feature-dimension robustness (`supplemental_analysis/feature_analysis/run_feature_analysis.sh`)
 
@@ -348,7 +352,8 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 |--------|-------------|--------------|
 | Figure 1 | Behavioral results | `analysis/analyze_behavior.py` |
 | Figure 2 | Eye-tracking results | `analysis/analyze_eyetracking.py` |
-| Figure 3 | NN overview | `metarnn/lib/plot_NN_overview.py` |
+| Figure 3 (D-J) | NN overview | `metarnn/lib/plot_NN_overview.py` |
+| Figure 3 (B-C) | Evidence accumulation + belief decoding | `metarnn/lib/plot_evidence_figure.py` + `metarnn/lib/run_belief_decoding.py` |
 | Figure 4 | NN-NN comparison | `metarnn/plot_NN_NN_comparison.py` |
 | Figure 5 | Next-fixation generation | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S2 | Behavioral supplement | `analysis/analyze_behavior.py` |

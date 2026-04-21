@@ -10,6 +10,9 @@ __pycache__/
 metarnn/simulations/human_like_*/output/choice_fixations_clean_buffer_50.csv
 metarnn/simulations/human_like_*/output/eyegaze/stats/choice_fixation_*_trial_deltas_long_duration.csv
 
+# Large simulation files with hidden states/logits
+metarnn/simulations/simulation_*/with_hidden/
+
 # Caches
 **/_cache/
 **/cache/*.pkl
