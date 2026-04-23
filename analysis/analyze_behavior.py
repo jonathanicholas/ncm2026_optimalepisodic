@@ -957,10 +957,10 @@ def compile_figure2_supplement(
             fontsize=26, fontweight="bold", ha="left", va="bottom")
 
         fig.tight_layout()
-        fig.savefig(os.path.join(out_dir, "FigureS2.pdf"), bbox_inches="tight")
+        fig.savefig(os.path.join(out_dir, "FigureS1.pdf"), bbox_inches="tight")
         supp_dir = os.path.join(os.getcwd(), "output", "figures", "supplementary")
         os.makedirs(supp_dir, exist_ok=True)
-        fig.savefig(os.path.join(supp_dir, "FigureS2.pdf"), bbox_inches="tight")
+        fig.savefig(os.path.join(supp_dir, "FigureS1.pdf"), bbox_inches="tight")
         plt.close(fig)
 
 
@@ -1062,7 +1062,7 @@ def main():
     )
     export_summary_stats(df_all, df_spatial_all, stats_dir)
 
-    print(f"Saved Figure1.pdf, FigureS2.pdf, subject summary, and stats CSVs to {out_dir}")
+    print(f"Saved Figure1.pdf, FigureS1.pdf, subject summary, and stats CSVs to {out_dir}")
 
 
 if __name__ == "__main__":

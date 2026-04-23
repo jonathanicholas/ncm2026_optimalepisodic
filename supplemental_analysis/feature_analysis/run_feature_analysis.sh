@@ -3,7 +3,7 @@
 #   1. Build choices.csv from the raw subject data.
 #   2. Build the two eye-fixation datasets from the main paper pipeline output.
 #   3. Fit the eight per-dimension brms models and write the deviation CSV.
-#   4. Render FigureS7.pdf from the deviation CSV.
+#   4. Render FigureS6.pdf from the deviation CSV.
 #
 # Assumes the `analysis` conda env is available.
 # Usage: ./run_feature_analysis.sh
@@ -31,7 +31,7 @@ python scripts/build_eye_fixation.py
 echo "[3/4] Fitting per-dimension brms models (this takes ~30-40 min)..."
 Rscript scripts/compute_feature_stats.R
 
-echo "[4/4] Rendering FigureS7.pdf..."
+echo "[4/4] Rendering FigureS6.pdf..."
 python scripts/plot_feature_deviation.py
 
-echo "Done. Output: $SCRIPT_DIR/output/FigureS7.pdf"
+echo "Done. Output: $SCRIPT_DIR/output/FigureS6.pdf"

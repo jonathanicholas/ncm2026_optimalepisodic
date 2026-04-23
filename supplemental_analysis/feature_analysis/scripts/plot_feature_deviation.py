@@ -6,7 +6,7 @@ the four feature dimensions' posterior deviations from the grand mean
 with 95% HDIs.
 
 Input:  ../output/feature_deviation_from_mean.csv
-Output: ../output/FigureS7.pdf
+Output: ../output/FigureS6.pdf
 """
 
 from __future__ import annotations
@@ -130,12 +130,12 @@ def main():
             draw_panel(ax, df_panel, title, xlabel)
 
         fig.tight_layout(h_pad=2.5, w_pad=3.0)
-        local_out = os.path.join(OUT_DIR, "FigureS7.pdf")
+        local_out = os.path.join(OUT_DIR, "FigureS6.pdf")
         fig.savefig(local_out, bbox_inches="tight")
         print(f"Wrote {local_out}")
 
         if os.path.isdir(SUPPLEMENT_DIR):
-            supplement_out = os.path.join(SUPPLEMENT_DIR, "FigureS7.pdf")
+            supplement_out = os.path.join(SUPPLEMENT_DIR, "FigureS6.pdf")
             fig.savefig(supplement_out, bbox_inches="tight")
             print(f"Wrote {supplement_out}")
         plt.close(fig)

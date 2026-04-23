@@ -42,7 +42,7 @@ ncm2026_optimalepisodic/
 │   ├── plot_kfold_parameter_bars.py   #   Plot fitted parameter estimates (d, theta, sigma)
 │   ├── plot_addm_ddm_comparison.py    #   Posterior predictive checks: aDDM vs DDM
 │   ├── plot_recovery_sweep.py         #   Visualize parameter recovery results
-│   ├── plot_addm_supplement.py        #   Combine PPC, fit params, and recovery into Figure S3
+│   ├── plot_addm_supplement.py        #   Combine PPC, fit params, and recovery into Figure S2
 │   └── lib/                           #   aDDM core implementation
 │       ├── adapted_addm_simulation.py #     Discrete-time aDDM simulator (drift + noise + boundaries)
 │       ├── addm_fitting.py            #     Group-level fitting: gaze stats, generative model, pyBADS
@@ -74,7 +74,7 @@ ncm2026_optimalepisodic/
 │   ├── run_nn_pipeline.sh             #   Pipeline: process NNs -> compare -> Bayesian stats
 │   ├── create_nn_figures.sh           #   Sub-pipeline: JSON simulations -> human-like CSVs + figures
 │   ├── plot_NN_NN_comparison.py       #   Compare two NN variants (Figure 4)
-│   ├── plot_NN_H_next_fixation_gen.py #   Human vs NN next-fixation generation (Figure 5, S5, S6)
+│   ├── plot_NN_H_next_fixation_gen.py #   Human vs NN next-fixation generation (Figure 5, S4, S5)
 │   ├── run_mixed_effects_human_vs_nn.R     # Bayesian models: human vs NN
 │   ├── run_mixed_effects_nn_nn_comparison.R  # Bayesian models: NN vs NN
 │   ├── run_mixed_effects_next_fixation_gen.R  # Bayesian models: fixation advantage + transitions
@@ -85,7 +85,7 @@ ncm2026_optimalepisodic/
 │   │   ├── plot_NN_overview.py        #     Overview visualization of NN behavior (Figure 3)
 │   │   ├── plot_NN_H_comparison.py    #     Direct human-NN comparison plots
 │   │   ├── plot_NN_sweep_transitions.py  #  Fixation transition patterns
-│   │   ├── plot_prop_drop_supplement.py  #  Fixation drop fraction supplement (Figure S4)
+│   │   ├── plot_prop_drop_supplement.py  #  Fixation drop fraction supplement (Figure S3)
 │   │   ├── export_nn_nn_comparison_data.py  # Export data for R statistical analysis
 │   │   ├── plot_evidence_figure.py    #     Evidence accumulation + decoding figure (Figure 3BC)
 │   │   └── run_belief_decoding.py     #     Decode belief states from hidden states (MLP + Ridge)
@@ -106,17 +106,17 @@ ncm2026_optimalepisodic/
 │
 ├── output/                            # All analysis results
 │   ├── figures/                       #   Manuscript figures (Figures 1-5)
-│   │   └── supplementary/            #   Supplementary figures (Figures S2-S7)
+│   │   └── supplementary/            #   Supplementary figures (Figures S1-S6)
 │   ├── behavior/                      #   Behavioral results
 │   │   ├── Figure1.pdf                #     Figure 1
-│   │   ├── FigureS2.pdf               #     Figure S2
+│   │   ├── FigureS1.pdf               #     Figure S1
 │   │   └── stats/                     #     CSVs: accuracy, choice, recall, RT, model summaries
 │   ├── eyegaze/                       #   Eye-tracking results
 │   │   ├── Figure2.pdf                #     Figure 2
 │   │   ├── recall/                    #     Group recall time courses + recall drop fraction
 │   │   └── stats/                     #     CSVs: fixation proportions, mixed-effects summaries
 │   ├── addm/                          #   aDDM modeling results
-│   │   ├── FigureS3.pdf               #     Figure S3
+│   │   ├── FigureS2.pdf               #     Figure S2
 │   │   ├── kfold/                     #     Per-seed, per-fold cross-validation outputs
 │   │   ├── kfold_compare/             #     Merged CV comparisons
 │   │   ├── ppc/                       #     Posterior predictive check data
@@ -125,11 +125,11 @@ ncm2026_optimalepisodic/
 │
 ├── supplemental_analysis/             # Supplementary robustness checks
 │   ├── feature_analysis/              #   Per-feature-dimension robustness
-│   │   ├── run_feature_analysis.sh    #     Pipeline: data -> 8 brms fits -> FigureS7
+│   │   ├── run_feature_analysis.sh    #     Pipeline: data -> 8 brms fits -> FigureS6
 │   │   ├── scripts/                   #     build, compute, plot scripts
 │   │   ├── data/                      #     Intermediate per-trial CSVs
 │   │   └── output/
-│   │       ├── FigureS7.pdf           #       Figure S7 (also copied to output/figures/supplementary/)
+│   │       ├── FigureS6.pdf           #       Figure S6 (also copied to output/figures/supplementary/)
 │   │       ├── feature_deviation_from_mean.csv
 │   │       └── model_summaries/
 │   └── block_analysis/                #   Block-number (round) interaction check
@@ -162,7 +162,7 @@ Compiles behavioral data and fits Bayesian mixed-effects models.
 analyze_behavior.py  -->  run_mixed_effects.R
 ```
 
-**Outputs:** `output/behavior/Figure1.pdf`, `output/behavior/FigureS2.pdf`, `output/behavior/stats/*.csv`
+**Outputs:** `output/behavior/Figure1.pdf`, `output/behavior/FigureS1.pdf`, `output/behavior/stats/*.csv`
 
 ### 2. Eye-tracking Analysis (`analysis/run_eyetracking.sh`)
 
@@ -190,10 +190,10 @@ run_kfold10_rt_transition_models.sh  (10-fold CV, 5 seeds)
   --> compare_cv_fits.py + plot_kfold_parameter_bars.py
   --> plot_addm_ddm_comparison.py  (posterior predictive checks)
   --> parameter_recovery_sweep.py + plot_recovery_sweep.py
-  --> plot_addm_supplement.py  (rtTrans only; FigureS3.pdf)
+  --> plot_addm_supplement.py  (rtTrans only; FigureS2.pdf)
 ```
 
-**Outputs:** `output/addm/kfold/`, `output/addm/kfold_compare/`, `output/addm/ppc/`, `output/addm/parameter_recovery_sweep/`, `output/addm/FigureS3.pdf`
+**Outputs:** `output/addm/kfold/`, `output/addm/kfold_compare/`, `output/addm/ppc/`, `output/addm/parameter_recovery_sweep/`, `output/addm/FigureS2.pdf`
 
 ### 4. RNN Training (`training/` — HPC cluster)
 
@@ -255,20 +255,20 @@ create_nn_figures.sh (input0 baseline)
 
 `create_nn_figures.sh` internally runs: JSON compilation, fixation preparation, choice fixation proportions, choice prediction (with recall-calibrated drop), prop-drop supplement, NN overview, and human-NN comparison figures. The pipeline also runs belief decoding (decoding metalevel MDP belief states from the network's hidden states via MLP) and generates the evidence accumulation figure (Figure 3, panels B-C) if simulation files with hidden states are available in `simulation_*/with_hidden/`. Pre-computed outputs are cached so the figure can be regenerated without the large JSON files.
 
-**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/Figure3BC.pdf`, `output/figures/supplementary/FigureS4-S6.pdf`
+**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/Figure3BC.pdf`, `output/figures/supplementary/FigureS3-S5.pdf`
 
 ### 6. Feature-dimension robustness (`supplemental_analysis/feature_analysis/run_feature_analysis.sh`)
 
-Fits per-feature-dimension reparameterizations of eight analyses from Pipelines 1 and 2 and produces Figure S7, summarising how each effect varies across the four feature dimensions.
+Fits per-feature-dimension reparameterizations of eight analyses from Pipelines 1 and 2 and produces Figure S6, summarising how each effect varies across the four feature dimensions.
 
 ```
 build_choices.py
   --> build_eye_fixation.py
   --> compute_feature_stats.R   (8 brms fits; ~30-40 min)
-  --> plot_feature_deviation.py (FigureS7.pdf)
+  --> plot_feature_deviation.py (FigureS6.pdf)
 ```
 
-**Outputs:** `supplemental_analysis/feature_analysis/output/FigureS7.pdf`, `.../feature_deviation_from_mean.csv`, `.../model_summaries/*.{txt,csv}`, `output/figures/supplementary/FigureS7.pdf`
+**Outputs:** `supplemental_analysis/feature_analysis/output/FigureS6.pdf`, `.../feature_deviation_from_mean.csv`, `.../model_summaries/*.{txt,csv}`, `output/figures/supplementary/FigureS6.pdf`
 
 ### 7. Block-number (round) robustness (`supplemental_analysis/block_analysis/run_block_analysis.sh`)
 
@@ -356,12 +356,12 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 | Figure 3 (B-C) | Evidence accumulation + belief decoding | `metarnn/lib/plot_evidence_figure.py` + `metarnn/lib/run_belief_decoding.py` |
 | Figure 4 | NN-NN comparison | `metarnn/plot_NN_NN_comparison.py` |
 | Figure 5 | Next-fixation generation | `metarnn/plot_NN_H_next_fixation_gen.py` |
-| Figure S2 | Behavioral supplement | `analysis/analyze_behavior.py` |
-| Figure S3 | aDDM supplement | `addm/plot_addm_supplement.py` |
-| Figure S4 | Fixation drop supplement | `metarnn/lib/plot_prop_drop_supplement.py` |
+| Figure S1 | Behavioral supplement | `analysis/analyze_behavior.py` |
+| Figure S2 | aDDM supplement | `addm/plot_addm_supplement.py` |
+| Figure S3 | Fixation drop supplement | `metarnn/lib/plot_prop_drop_supplement.py` |
+| Figure S4 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
 | Figure S5 | Transition supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
-| Figure S6 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
-| Figure S7 | Per-feature-dimension robustness | `supplemental_analysis/feature_analysis/scripts/plot_feature_deviation.py` |
+| Figure S6 | Per-feature-dimension robustness | `supplemental_analysis/feature_analysis/scripts/plot_feature_deviation.py` |
 
 ---
 

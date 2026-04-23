@@ -442,7 +442,7 @@ def _plot_fixation_advantage_vertical(
     ax.axhline(0, color="black", linestyle="-", linewidth=1.5, zorder=1)
     ax.set_xticks([])
     ax.set_xlim(-0.7, 0.7)  # white space around bar
-    ax.set_ylabel(f"Fixation Advantage ({time_unit_label})")
+    ax.set_ylabel(f"Time advantage ({time_unit_label})")
     ax.spines[["top", "right", "bottom"]].set_visible(False)
 
     if ylim is not None:
@@ -515,6 +515,16 @@ def _plot_single_heatmap(
         xticklabels=[str(j) for j in range(1, n_items + 1)],
         yticklabels=[str(j) for j in range(1, n_items + 1)],
     )
+    if mask_diagonal:
+        for i in range(mat.shape[0]):
+            ax.add_patch(plt.Rectangle(
+                (i, i), 1, 1,
+                facecolor="white",
+                hatch="/////",
+                edgecolor="black",
+                linewidth=1.5,
+                zorder=3,
+            ))
     if border:
         for spine in ax.spines.values():
             spine.set_visible(True)
@@ -536,7 +546,7 @@ def _plot_single_delta_similarity(
     ax: plt.Axes,
     delta_vals: np.ndarray,
     *,
-    ylabel: str = "Similarity (Obs. \u2212 Chance)",
+    ylabel: str = "Similarity above chance",
     ylim: Optional[Tuple[float, float]] = None,
     yticks: Optional[Sequence[float]] = None,
 ) -> None:
@@ -598,7 +608,7 @@ def _plot_single_runlength_delta(
     transprop_null_all: np.ndarray,
     bin_labels: Sequence[str],
     *,
-    ylabel: str = "Seq. Prop. (Obs. \u2212 Chance)",
+    ylabel: str = "Proportion above chance",
     ylim: Optional[Tuple[float, float]] = None,
     yticks: Optional[Sequence[float]] = None,
 ) -> None:
@@ -664,8 +674,9 @@ def _create_transition_supplement(
         "axes.titlesize": 22,
         "xtick.labelsize": 16,
         "ytick.labelsize": 16,
+        "hatch.linewidth": 1.5,
     }):
-        fig = plt.figure(figsize=(12, 7))
+        fig = plt.figure(figsize=(12, 8.5))
         gs_outer = fig.add_gridspec(2, 2, hspace=0.55, wspace=0.55)
 
         # Shared heatmap color scale
@@ -692,18 +703,25 @@ def _create_transition_supplement(
             row_axes = []
             for c, (tname, ctitle) in enumerate(zip(col_templates, col_titles)):
                 gs_cell = gs_outer[r, c].subgridspec(
-                    1, 2, wspace=0.8, width_ratios=[1, 0.4],
+                    1, 2, wspace=1.2, width_ratios=[1, 0.4],
                 )
                 ax_template = fig.add_subplot(gs_cell[0, 0])
                 ax_delta = fig.add_subplot(gs_cell[0, 1])
 
+                divider_tmpl = make_axes_locatable(ax_template)
+                ax_cbar_tmpl = divider_tmpl.append_axes("right", size="5%", pad=0.08)
                 _plot_single_heatmap(
                     ax_template, templates[tname],
-                    cmap="binary",
+                    cmap="viridis",
                     title=ctitle if r == 0 else "",
                     vmin=0.0, vmax=0.5,
                     mask_diagonal=True,
+                    cbar=True,
+                    cbar_ax=ax_cbar_tmpl,
                 )
+                ax_cbar_tmpl.set_yticks([0.0, 0.25, 0.5])
+                ax_cbar_tmpl.set_yticklabels(["0.00", "0.25", "0.50"])
+                ax_cbar_tmpl.tick_params(labelsize=14)
 
                 delta = sweep["delta_similarity"][PANEL_ALL][tname]
                 _plot_single_delta_similarity(
@@ -829,7 +847,7 @@ def _create_advantage_supplement(
             ax.set_xticklabels(categories)
             ax.set_xlim(xs[0] - 0.7, xs[-1] + 0.7)
             ax.set_ylim(shared_ylim)
-            ax.set_ylabel(f"Fixation Advantage ({gcfg['time_unit']})")
+            ax.set_ylabel(f"Time advantage ({gcfg['time_unit']})")
             ax.set_title(gcfg["label"], fontsize=26, fontweight="normal")
             ax.spines[["top", "right"]].set_visible(False)
 
@@ -942,6 +960,7 @@ def create_figure(
         "axes.titlesize": 22,
         "xtick.labelsize": 16,
         "ytick.labelsize": 16,
+        "hatch.linewidth": 1.5,
     }):
         fig = plt.figure(figsize=(17.5, 12))
         # Outer grid: [heatmaps+run-length | fixation_advantage]. Figure is
@@ -950,9 +969,9 @@ def create_figure(
         # more breathing room between the middle and final columns.
         gs_outer = fig.add_gridspec(
             2, 2,
-            wspace=0.3,
+            wspace=0.0,
             hspace=0.45,
-            width_ratios=[3.0, 0.31],
+            width_ratios=[0.31, 3.0],
         )
 
         # Heatmap color scale: per-row sequential range [vmin, vmax] fitted
@@ -988,23 +1007,8 @@ def create_figure(
 
         row_configs = [
             {
-                "label": "Network",
-                "panel_prefix": ["A", "B", "C"],
-                "time_unit": "steps",
-                "time_scale": 1.0,
-                "fa_data": n_all,
-                "sweep": nn_sweep,
-                "hm_vmin": hm_vmin_nn,
-                "hm_vmax": hm_vmax_nn,
-                "hm_cmap": hm_cmap,
-                "ds_ylim": (0, 0.3),
-                "ds_yticks": [0, 0.1, 0.2, 0.3],
-                "rl_ylim": (0, 0.02),
-                "rl_yticks": [0, 0.01, 0.02],
-            },
-            {
                 "label": "Humans",
-                "panel_prefix": ["D", "E", "F"],
+                "panel_prefix": ["A", "B", "C"],
                 "time_unit": "s",
                 "time_scale": 1.0 / 1000.0,  # ms -> s
                 "fa_data": h_all,
@@ -1017,12 +1021,27 @@ def create_figure(
                 "rl_ylim": (0, 0.06),
                 "rl_yticks": [0, 0.03, 0.06],
             },
+            {
+                "label": "Network",
+                "panel_prefix": ["D", "E", "F"],
+                "time_unit": "steps",
+                "time_scale": 1.0,
+                "fa_data": n_all,
+                "sweep": nn_sweep,
+                "hm_vmin": hm_vmin_nn,
+                "hm_vmax": hm_vmax_nn,
+                "hm_cmap": hm_cmap,
+                "ds_ylim": (0, 0.3),
+                "ds_yticks": [0, 0.1, 0.2, 0.3],
+                "rl_ylim": (0, 0.02),
+                "rl_yticks": [0, 0.01, 0.02],
+            },
         ]
 
         for r, cfg in enumerate(row_configs):
             sweep = cfg["sweep"]
             # --- Column 1: Fixation Advantage (vertical, All only) ---
-            ax_col1 = fig.add_subplot(gs_outer[r, 1])
+            ax_col1 = fig.add_subplot(gs_outer[r, 0])
             _plot_fixation_advantage_vertical(
                 ax_col1, cfg["fa_data"],
                 time_unit_label=cfg["time_unit"],
@@ -1035,7 +1054,7 @@ def create_figure(
             # its new colorbar without overlapping the similarity y-label,
             # while also bumping the run-length column up slightly so it
             # doesn't visually shrink relative to the widened heatmap area.
-            gs_right = gs_outer[r, 0].subgridspec(
+            gs_right = gs_outer[r, 1].subgridspec(
                 1, 2,
                 wspace=0.45,
                 width_ratios=[2.25, 1.2],
@@ -1052,22 +1071,24 @@ def create_figure(
             ax_obs_trans = fig.add_subplot(gs_col2[1, 0])
             ax_delta_sim = fig.add_subplot(gs_col2[:, 1])
 
-            # Template heatmap (top-left) — grayscale binary reference.
-            # Diagonal is masked (rendered white) so it is clear that
+            # Template heatmap (top-left) — viridis binary reference.
+            # Diagonal cells are rendered solid black to mark that
             # self-transitions are excluded by construction.
-            # A hidden colorbar placeholder keeps the template aligned
-            # with the observed heatmap below (which has a visible cbar).
             divider_tmpl = make_axes_locatable(ax_template)
             ax_cbar_tmpl = divider_tmpl.append_axes("right", size="5%", pad=0.08)
-            ax_cbar_tmpl.set_visible(False)
             _plot_single_heatmap(
                 ax_template, bi_template,
-                cmap="binary",
+                cmap="viridis",
                 title="Template",
                 vmin=0.0, vmax=0.5,
                 show_xlabel=False, show_ylabel=False,
                 mask_diagonal=True,
+                cbar=True,
+                cbar_ax=ax_cbar_tmpl,
             )
+            ax_cbar_tmpl.set_yticks([0.0, 0.25, 0.5])
+            ax_cbar_tmpl.set_yticklabels(["0.00", "0.25", "0.50"])
+            ax_cbar_tmpl.tick_params(labelsize=14)
 
             # Observed transition heatmap (bottom-left): row-normalized
             # conditional transition probabilities. The diagonal is always
@@ -1115,8 +1136,8 @@ def create_figure(
             )
 
             # Store axes for row title placement after layout
-            cfg["_ax_left"] = ax_template
-            cfg["_ax_right"] = ax_col1
+            cfg["_ax_left"] = ax_col1
+            cfg["_ax_right"] = ax_col3
 
         # Force layout so get_position() returns final coords
         fig.canvas.draw()

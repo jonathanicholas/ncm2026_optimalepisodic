@@ -126,7 +126,7 @@ def add_panel_A_time_course(ax, roi_type: str = "original", buffer_size: int = 5
     ax.set_yticklabels([0, 0.2, 0.4, 0.6])
     #ax.set_ylabel("Proportion of Fixation Time on Recalled Item Location")
     ax.set_ylabel("Proportion Fixation Time")
-    ax.set_xlabel("Time Relative to Recall Onset (s)")
+    ax.set_xlabel("Time Relative to Verbal Recall (s)")
 
     # Clean look: no top/right spines handled later by layout code
     sns.despine(ax=ax)
@@ -190,7 +190,7 @@ def add_panel_A_time_course_subject(
     ax.set_yticks([0, 0.2, 0.4, 0.6])
     ax.set_yticklabels([0, 0.2, 0.4, 0.6])
     ax.set_ylabel("Proportion Fixation Time")
-    ax.set_xlabel("Time Relative to Recall Onset (s)")
+    ax.set_xlabel("Time Relative to Verbal Recall (s)")
 
     sns.despine(ax=ax)
 

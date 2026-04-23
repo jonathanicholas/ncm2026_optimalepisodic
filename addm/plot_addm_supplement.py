@@ -460,11 +460,11 @@ def main() -> None:
             ha="center", va="top", fontsize=28,
         )
 
-        out_pdf = out_dir / "FigureS3.pdf"
+        out_pdf = out_dir / "FigureS2.pdf"
         fig.savefig(out_pdf, bbox_inches="tight")
         supp_dir = Path.cwd() / "output" / "figures" / "supplementary"
         supp_dir.mkdir(parents=True, exist_ok=True)
-        fig.savefig(supp_dir / "FigureS3.pdf", bbox_inches="tight")
+        fig.savefig(supp_dir / "FigureS2.pdf", bbox_inches="tight")
         plt.close(fig)
 
     print(f"Wrote: {out_pdf}")
