@@ -165,7 +165,7 @@ def _plot_accumulation(ax, all_dfs, col, ylabel, yticks=None):
         gs = np.array(grand_sem)
         valid = ~np.isnan(gm)
 
-        ax.plot(x_pos[valid], gm[valid], color=color, linewidth=2.5,
+        ax.plot(x_pos[valid], gm[valid], color=color, linewidth=3.5,
                 label=decision)
         ax.fill_between(x_pos[valid], gm[valid] - gs[valid],
                         gm[valid] + gs[valid], color=color, alpha=_SEM_ALPHA,
@@ -187,11 +187,11 @@ def _plot_accumulation(ax, all_dfs, col, ylabel, yticks=None):
 
 
 def plot_decoding_bars(ax, csv_path):
-    """Plot MLP decoding R^2 from the saved CSV."""
+    """Plot OLS decoding R^2 from the saved CSV."""
     df = pd.read_csv(csv_path)
 
-    real = df[(df["decoder"] == "MLP") & (~df["shuffle"])]
-    shuf = df[(df["decoder"] == "MLP") & (df["shuffle"])]
+    real = df[(df["decoder"] == "OLS") & (~df["shuffle"])]
+    shuf = df[(df["decoder"] == "OLS") & (df["shuffle"])]
 
     stats_order = ["V_t", "mu", "lambda", "rho"]
     labels = ["$V_t$", "$\\mu_t$", "$\\lambda_t$", "$\\rho_t$"]
@@ -207,7 +207,7 @@ def plot_decoding_bars(ax, csv_path):
         se = (np.std(seed_vals, ddof=1) / np.sqrt(len(seed_vals))
               if len(seed_vals) > 1 else 0)
 
-        bottom = -0.1
+        bottom = -0.05
         bw = 0.5
         ax.bar(x_pos[i], m - bottom, bw, bottom=bottom, color=".7",
                edgecolor="none", linewidth=0, zorder=2)
@@ -235,7 +235,8 @@ def plot_decoding_bars(ax, csv_path):
     ax.set_xticks(x_pos)
     ax.set_xticklabels(labels)
     ax.set_ylabel("$R^2$")
-    ax.set_ylim(bottom=-0.1)
+    ax.set_ylim(-0.05, 1.0)
+    ax.set_yticks([0, 1])
     sns.despine(ax=ax)
 
 
