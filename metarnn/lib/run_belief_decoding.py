@@ -7,6 +7,11 @@ GroupKFold with the trial as the group, so timesteps from a given trial
 never appear in both train and test. Saves per-seed, per-location R^2 to a
 CSV; chance is estimated from 1000 shuffled-target permutations.
 
+Also decodes the per-location relevance-weighted reward (mu_i * rho_i) and
+per-location mu_i restricted to rows where rho_i is above or below 0.5,
+which together characterize how the network's representation of mu depends
+on the relevance gate.
+
 Skips computation if the output CSV already exists (use --force to override).
 
 Example:
@@ -89,6 +94,27 @@ def _r2(y_true, y_pred):
     return 1 - ss_res / ss_tot if ss_tot > 0 else 0.0
 
 
+def cv_ols(X, y, groups, n_folds, drop_below=-1.0):
+    """OLS GroupKFold R^2 without shuffles.
+
+    Folds with R^2 < `drop_below` are discarded and the remaining folds are
+    averaged. This protects against pathological folds where the test set
+    happens to have near-constant labels and ss_tot is tiny, which would
+    make R^2 blow up to large negative values.
+    """
+    gkf = GroupKFold(n_splits=n_folds)
+    r2s = []
+    for train_idx, test_idx in gkf.split(X, y, groups):
+        P = np.linalg.pinv(X[train_idx])
+        beta = P @ y[train_idx]
+        r2 = _r2(y[test_idx], X[test_idx] @ beta)
+        if r2 > drop_below:
+            r2s.append(r2)
+    if not r2s:
+        return float("nan")
+    return float(np.mean(r2s))
+
+
 def cv_ols_with_shuffles(X, y, groups, n_folds, n_shuffles, rng):
     """OLS cross-validation with shuffled-target chance baselines.
 
@@ -138,12 +164,15 @@ def decode_one_seed(args_tuple):
     groups = ext["groups"]
     print(f"  [Seed {seed}] {len(H)} observations")
 
+    mus = ext["mus"]
+    lambdas = ext["lambdas"]
+    rhos = ext["rhos"]
     targets = {
-        "mu": ext["mus"],
-        "lambda": ext["lambdas"],
-        "rho": ext["rhos"],
+        "mu": mus,
+        "lambda": lambdas,
+        "rho": rhos,
     }
-    V_t = np.sum(ext["mus"] * ext["rhos"], axis=1)
+    V_t = np.sum(mus * rhos, axis=1)
 
     rng = np.random.default_rng(seed)
 
@@ -157,6 +186,11 @@ def decode_one_seed(args_tuple):
             rows.append({"seed": seed, "statistic": statistic,
                          "location": location, "decoder": "OLS", "r2": r2,
                          "shuffle": True, "shuffle_iter": shuf_i})
+
+    def _record_real(statistic, location, r2):
+        rows.append({"seed": seed, "statistic": statistic, "location": location,
+                     "decoder": "OLS", "r2": r2, "shuffle": False,
+                     "shuffle_iter": -1})
 
     # V_t aggregate
     real_r2, shuf_r2s = cv_ols_with_shuffles(H, V_t, groups, n_folds, n_shuffles, rng)
@@ -172,6 +206,28 @@ def decode_one_seed(args_tuple):
             real_r2, shuf_r2s = cv_ols_with_shuffles(H, y, groups, n_folds,
                                                       n_shuffles, rng)
             _record(stat_name, loc, real_r2, shuf_r2s)
+
+    # Per-location relevance-weighted reward, and per-location mu split by
+    # whether the relevance posterior at that slot is above or below 0.5.
+    for loc in range(6):
+        mu_i = mus[:, loc]
+        rho_i = rhos[:, loc]
+        prod_i = mu_i * rho_i
+
+        if np.std(prod_i) > 1e-8:
+            _record_real("mu*rho", loc,
+                          cv_ols(H, prod_i, groups, n_folds))
+
+        for label, mask in [("mu_when_rho_above_half", rho_i >= 0.5),
+                             ("mu_when_rho_below_half", rho_i < 0.5)]:
+            n_mask = int(mask.sum())
+            if n_mask < 200 or len(np.unique(groups[mask])) < n_folds:
+                continue
+            mu_sub = mu_i[mask]
+            if np.std(mu_sub) < 1e-8:
+                continue
+            _record_real(label, loc,
+                          cv_ols(H[mask], mu_sub, groups[mask], n_folds))
 
     print(f"  [Seed {seed}] Done.")
     return rows

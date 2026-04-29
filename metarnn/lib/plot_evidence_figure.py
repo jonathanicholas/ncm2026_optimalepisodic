@@ -240,6 +240,86 @@ def plot_decoding_bars(ax, csv_path):
     sns.despine(ax=ax)
 
 
+def _supplement_per_seed_means(df, target):
+    sub = df[df["statistic"] == target]
+    if len(sub) == 0:
+        return np.array([])
+    return sub.groupby("seed")["r2"].mean().values
+
+
+def _supplement_bar(ax, x, seed_vals, bw=0.5, bottom=-0.05):
+    if len(seed_vals) == 0:
+        return
+    m = float(np.nanmean(seed_vals))
+    se = (float(np.nanstd(seed_vals, ddof=1) /
+                np.sqrt(np.sum(~np.isnan(seed_vals))))
+          if np.sum(~np.isnan(seed_vals)) > 1 else 0.0)
+    ax.bar(x, m - bottom, bw, bottom=bottom, color=".7",
+           edgecolor="none", linewidth=0, zorder=2)
+    ax.bar(x, m - bottom, bw, bottom=bottom, color="none",
+           edgecolor="black", linewidth=_BAR_LINEWIDTH, zorder=4)
+    ax.errorbar(x, m, yerr=se, fmt="none", ecolor="black",
+                capsize=0, linewidth=_ERRORBAR_LINEWIDTH, zorder=5)
+    rng = np.random.default_rng(99)
+    jitter = rng.uniform(-0.12, 0.12, size=len(seed_vals))
+    ax.scatter(np.full(len(seed_vals), x) + jitter, seed_vals, s=36,
+               facecolor=(1, 1, 1, 0.5), edgecolor=".7",
+               linewidth=1, zorder=3)
+
+
+def plot_belief_decoding_supplement(csv_path, out_dir):
+    """Two-panel supplementary figure characterizing how mu decoding
+    depends on the relevance posterior.
+    """
+    df = pd.read_csv(csv_path)
+    df = df[(df["decoder"] == "OLS") & (~df["shuffle"])]
+
+    sns.set_context("talk")
+    plt.rcParams.update({
+        "font.family": "Arial",
+        "axes.labelsize": 18,
+        "xtick.labelsize": 14,
+        "ytick.labelsize": 14,
+    })
+
+    fig, axes = plt.subplots(
+        1, 2, figsize=(8, 3.5),
+        gridspec_kw={"wspace": 0.55, "width_ratios": [3, 2]})
+
+    left_targets = [("rho", r"$\rho_t$"),
+                    ("mu", r"$\mu_t$"),
+                    ("mu*rho", r"$\mu_t\,\rho_t$")]
+    x_left = np.arange(len(left_targets))
+    for i, (tgt, _) in enumerate(left_targets):
+        _supplement_bar(axes[0], x_left[i],
+                         _supplement_per_seed_means(df, tgt))
+    axes[0].set_xticks(x_left)
+    axes[0].set_xticklabels([lbl for _, lbl in left_targets])
+    axes[0].set_ylabel("$R^2$")
+    axes[0].set_ylim(-0.05, 1.0)
+    axes[0].set_yticks([0, 1])
+    sns.despine(ax=axes[0])
+
+    right_targets = [("mu_when_rho_above_half", r"$\rho \geq 0.5$"),
+                     ("mu_when_rho_below_half", r"$\rho < 0.5$")]
+    x_right = np.arange(len(right_targets))
+    for i, (tgt, _) in enumerate(right_targets):
+        _supplement_bar(axes[1], x_right[i],
+                         _supplement_per_seed_means(df, tgt))
+    axes[1].set_xticks(x_right)
+    axes[1].set_xticklabels([lbl for _, lbl in right_targets])
+    axes[1].set_ylabel(r"$R^2$ ($\mu_t$ decoding)")
+    axes[1].set_ylim(-0.05, 1.0)
+    axes[1].set_yticks([0, 1])
+    sns.despine(ax=axes[1])
+
+    out_path = os.path.join(out_dir, "belief_decoding_supplement.pdf")
+    fig.savefig(out_path, bbox_inches="tight", dpi=300)
+    fig.savefig(out_path.replace(".pdf", ".png"), bbox_inches="tight", dpi=150)
+    print(f"Saved: {out_path}")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Evidence accumulation figure (Figure 3 panels B-C)")
@@ -328,6 +408,8 @@ def main():
     fig.savefig(out_path.replace(".pdf", ".png"), bbox_inches="tight", dpi=150)
     print(f"Saved: {out_path}")
     plt.close(fig)
+
+    plot_belief_decoding_supplement(args.decoding_csv, args.out_dir)
 
 
 if __name__ == "__main__":

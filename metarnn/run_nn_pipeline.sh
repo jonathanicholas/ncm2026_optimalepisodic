@@ -155,16 +155,21 @@ mkdir -p output/figures/supplementary
 
 cp "${OUTN}/output/overview/FigureNN_overview_${TAGN}.pdf" \
    output/figures/Figure3.pdf
-cp "${OUTN}/output/overview/propDropSupplement_${TAGN}.pdf" \
-   output/figures/supplementary/FigureS3.pdf
 cp "${OUTN}/output/human_comparison/FigureNN_NN_comparison_${TAGN}_vs_input0.pdf" \
    output/figures/Figure4.pdf
 cp "${OUTN}/output/next_fixation_gen/FigureNN_H_next_fixation_gen_${TAGN}.pdf" \
    output/figures/Figure5.pdf
-cp "${OUTN}/output/next_fixation_gen/FigureAdvantageSupplement_${TAGN}.pdf" \
+
+if [ -f "${OUT0}/output/evidence/belief_decoding_supplement.pdf" ]; then
+  cp "${OUT0}/output/evidence/belief_decoding_supplement.pdf" \
+     output/figures/supplementary/FigureS3.pdf
+fi
+cp "${OUTN}/output/overview/propDropSupplement_${TAGN}.pdf" \
    output/figures/supplementary/FigureS4.pdf
-cp "${OUTN}/output/next_fixation_gen/FigureTransitionSupplement_${TAGN}.pdf" \
+cp "${OUTN}/output/next_fixation_gen/FigureAdvantageSupplement_${TAGN}.pdf" \
    output/figures/supplementary/FigureS5.pdf
+cp "${OUTN}/output/next_fixation_gen/FigureTransitionSupplement_${TAGN}.pdf" \
+   output/figures/supplementary/FigureS6.pdf
 
 if [ -f "${OUT0}/output/evidence/evidence_figure.pdf" ]; then
   cp "${OUT0}/output/evidence/evidence_figure.pdf" \
