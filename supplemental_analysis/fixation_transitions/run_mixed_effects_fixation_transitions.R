@@ -1,15 +1,12 @@
-# Bayesian statistical tests for next-fixation-generation effects
+# Bayesian statistical tests for fixation-transition structure (Figure S6).
 #
-# Tests three families of effects (for humans and NN separately):
-#   1) Fixation advantage: median per subject differs from 0
-#      (all, relevant, irrelevant conditions)
-#   2) Delta similarity: each template direction vs 0 + pairwise comparisons
+# Tests two families of effects (for humans and NN separately):
+#   1) Delta similarity: each template direction vs 0 + pairwise comparisons
 #      (bidirectional, forward, backward)
-#   3) Sequence length: delta proportion at each bin vs 0
-#      (bins 1-5, 6+)
+#   2) Sequence length: delta proportion at each bin vs 0 (bins 1-5, 6+)
 #
 # Usage:
-#   Rscript metarnn/run_mixed_effects_next_fixation_gen.R \
+#   Rscript supplemental_analysis/fixation_transitions/run_mixed_effects_fixation_transitions.R \
 #     --nn-root metarnn/simulations/human_like_04_04_input5 \
 #     --tag 04_04_input5
 
@@ -107,25 +104,16 @@ save_hypothesis <- function(prefix, fit, hypotheses) {
 
 message("\n=== Loading CSVs ===")
 
-fa_medians_path <- file.path(stats_dir, paste0("fixation_advantage_subject_medians", tag_suffix, ".csv"))
-fa_fixlevel_path <- file.path(stats_dir, paste0("fixation_advantage_human_fixlevel", tag_suffix, ".csv"))
 dsim_path <- file.path(stats_dir, paste0("delta_similarity_subject", tag_suffix, ".csv"))
 seqlen_path <- file.path(stats_dir, paste0("seq_length_delta_subject", tag_suffix, ".csv"))
 
-fa_medians_df <- readr::read_csv(fa_medians_path, show_col_types = FALSE)
-fa_fixlevel_df <- readr::read_csv(fa_fixlevel_path, show_col_types = FALSE)
 dsim_df <- readr::read_csv(dsim_path, show_col_types = FALSE)
 seqlen_df <- readr::read_csv(seqlen_path, show_col_types = FALSE)
 
-message("  FA subject medians:  ", nrow(fa_medians_df), " rows")
-message("  FA fixation-level:   ", nrow(fa_fixlevel_df), " rows")
 message("  Delta similarity:    ", nrow(dsim_df), " rows")
 message("  Sequence length:     ", nrow(seqlen_df), " rows")
 
 # Ensure factor types
-fa_medians_df$subject <- as.factor(fa_medians_df$subject)
-fa_medians_df$group <- as.factor(fa_medians_df$group)
-fa_fixlevel_df$subject <- as.factor(fa_fixlevel_df$subject)
 dsim_df$subject <- as.factor(dsim_df$subject)
 dsim_df$group <- as.factor(dsim_df$group)
 dsim_df$template <- as.factor(dsim_df$template)
@@ -134,64 +122,12 @@ seqlen_df$group <- as.factor(seqlen_df$group)
 seqlen_df$seq_length <- factor(seqlen_df$seq_length, levels = c("1", "2", "3", "4", "5", "6+"))
 
 # ===========================================================================
-# Test 1: Fixation Advantage vs 0
-# ===========================================================================
-
-message("\n=== Test 1: Fixation Advantage vs 0 ===")
-
-conditions <- c("all", "relevant", "irrelevant")
-
-# --- Human: hierarchical model on fixation-level data ---
-for (cond in conditions) {
-  model_name <- paste0("fa_human_", cond)
-  message(sprintf("\n[%s] fixation_advantage ~ 1 + (1 | subject) [hierarchical]", model_name))
-
-  d <- fa_fixlevel_df %>% filter(condition == cond)
-  message(sprintf("  N = %d fixations from %d subjects", nrow(d), length(unique(d$subject))))
-
-  fit <- brm(
-    fixation_advantage ~ 1 + (1 | subject),
-    data = d,
-    family = student(),
-    chains = brms_chains,
-    iter = brms_iter,
-    cores = brms_cores,
-    seed = brms_seed
-  )
-
-  save_model_outputs(model_name, fit)
-  save_hypothesis(model_name, fit, "Intercept = 0")
-}
-
-# --- NN: intercept-only on subject medians (too many fixations for hierarchical) ---
-for (cond in conditions) {
-  model_name <- paste0("fa_nn_", cond)
-  message(sprintf("\n[%s] median_fixation_advantage ~ 1 [student-t, intercept-only]", model_name))
-
-  d <- fa_medians_df %>% filter(group == "nn", condition == cond)
-  message(sprintf("  N = %d subjects", nrow(d)))
-
-  fit <- brm(
-    median_fixation_advantage ~ 1,
-    data = d,
-    family = student(),
-    chains = brms_chains,
-    iter = brms_iter,
-    cores = brms_cores,
-    seed = brms_seed
-  )
-
-  save_model_outputs(model_name, fit)
-  save_hypothesis(model_name, fit, "Intercept = 0")
-}
-
-# ===========================================================================
-# Test 2: Delta Similarity — vs 0 and pairwise
+# Test 1: Delta Similarity — vs 0 and pairwise
 # ===========================================================================
 
 groups <- c("human", "nn")
 
-message("\n=== Test 2: Delta Similarity ===")
+message("\n=== Test 1: Delta Similarity ===")
 
 for (grp in groups) {
   model_name <- paste0("dsim_", grp)
@@ -224,10 +160,10 @@ for (grp in groups) {
 }
 
 # ===========================================================================
-# Test 3: Sequence Length Delta — per-bin vs 0
+# Test 2: Sequence Length Delta — per-bin vs 0
 # ===========================================================================
 
-message("\n=== Test 3: Sequence Length Delta ===")
+message("\n=== Test 2: Sequence Length Delta ===")
 
 for (grp in groups) {
   model_name <- paste0("seqlen_", grp)

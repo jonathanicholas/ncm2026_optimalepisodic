@@ -1,26 +1,18 @@
 #!/usr/bin/env python3
-"""Human vs NN next-fixation-generation comparison figure (2 rows x 3 columns).
+"""Fixation-transition structure: humans vs. prior-memory network (Figure S6).
 
-Row 1 = Human, Row 2 = Network.
-
-Column 1: Subject median fixation advantage (horizontal orientation,
-           symmetric x-limits around 0).
-Column 2: Bidirectional template + observed transition heatmaps (left),
-           bidirectional delta-similarity scatter (right).
-Column 3: Delta fraction of transitions by run length (all fixations).
-
-Also generates two supplementary figures:
-  - TransitionSupplement: 2 rows x 2 cols showing forward/backward templates
-    (same layout as columns 2-3 of main figure, but for forward and backward).
-  - AdvantageSupplement: Fixation advantage broken down by Relevant vs
-    Irrelevant, with Humans and Network side by side.
+A 2 row x 2 column figure (Row 1 = Human, Row 2 = Network):
+  Column 1: Bidirectional template + observed transition heatmaps (left),
+            bidirectional delta-similarity scatter (right).
+  Column 2: Delta fraction of transitions by run length (all fixations).
 
 Sweep transition data is cached to disk so that subsequent runs skip the
 expensive shuffle computation.
 
 Example
 -------
-conda run -n analysis python metarnn/plot_NN_H_next_fixation_gen.py \
+conda run -n analysis python \
+  supplemental_analysis/fixation_transitions/plot_fixation_transitions.py \
   --nn-root metarnn/simulations/human_like_04_04_input5 \
   --tag 04_04_input5 \
   --n-sims 1000 \
@@ -42,7 +34,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
@@ -53,13 +45,7 @@ from analysis.lib.analyze_choice_fixation_sweeps import (  # noqa: E402
     nanmean_safe,
     sweep_template_matrices,
 )
-from analysis.lib.plot_fixation_advantage_violin import (  # noqa: E402
-    COLORS as FA_COLORS,
-    compute_fixation_advantages,
-    load_all_fixations,
-)
 from metarnn.lib.plot_NN_sweep_transitions import (  # noqa: E402
-    MAX_RUN_BIN,
     _ensure_dir,
     compute_sweep_transition_data,
 )
@@ -82,53 +68,6 @@ def _cache_key(
 
 def _sweep_cache_path(base_dir: Path, cache_key: str) -> Path:
     return base_dir / "output" / "next_fixation_gen" / "cache" / f"sweep_data_{cache_key}.pkl"
-
-
-def _fa_cache_key(
-    data_dir: Path, excluded_subjects: Tuple[str, ...],
-    other_items_mode: str, advantage_timepoint: str,
-) -> str:
-    """Deterministic cache key for a fixation-advantage dataframe."""
-    raw = (
-        f"{data_dir.resolve()}|{sorted(excluded_subjects)}"
-        f"|{other_items_mode}|{advantage_timepoint}"
-    )
-    return hashlib.md5(raw.encode()).hexdigest()[:12]
-
-
-def _fa_cache_path(cache_root: Path, cache_key: str) -> Path:
-    return cache_root / "output" / "next_fixation_gen" / "cache" / f"fa_data_{cache_key}.pkl"
-
-
-def _load_or_compute_fa(
-    *,
-    cache_root: Path,
-    data_dir: Path,
-    excluded_subjects: Tuple[str, ...],
-    other_items_mode: str = "all",
-    advantage_timepoint: str = "pre",
-    label: str = "",
-) -> pd.DataFrame:
-    """Load cached or compute and cache a fixation-advantage dataframe."""
-    key = _fa_cache_key(
-        data_dir, excluded_subjects, other_items_mode, advantage_timepoint,
-    )
-    cache_path = _fa_cache_path(cache_root, key)
-
-    if cache_path.exists():
-        print(f"Loading cached {label} fixation advantage from {cache_path} ...", flush=True)
-        return pd.read_pickle(cache_path)
-
-    print(f"Computing {label} fixation advantage ...", flush=True)
-    fix = load_all_fixations(data_dir, excluded_subjects=excluded_subjects)
-    adv = compute_fixation_advantages(
-        fix, other_items_mode=other_items_mode, advantage_timepoint=advantage_timepoint,
-    )
-
-    _ensure_dir(cache_path.parent)
-    adv.to_pickle(cache_path)
-    print(f"  Cached {label} fixation advantage to {cache_path}", flush=True)
-    return adv
 
 
 def _derive_subject_ids(
@@ -235,23 +174,6 @@ def _load_or_compute_sweep(
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _subset_advantage(df: pd.DataFrame, item_subset: str) -> pd.DataFrame:
-    """Subset fixation advantage data by item relevance category."""
-    if item_subset == "all":
-        out = df.copy()
-        out["fixation_advantage"] = out["fixation_advantage_all"]
-        return out
-    if item_subset == "relevant":
-        out = df[df["is_relevant"] == 1].copy()
-        out["fixation_advantage"] = out["fixation_advantage_relevant"]
-        return out
-    if item_subset == "irrelevant":
-        out = df[df["is_relevant"] == 0].copy()
-        out["fixation_advantage"] = out["fixation_advantage_irrelevant"]
-        return out
-    raise ValueError(f"Invalid item_subset: {item_subset}")
-
-
 def _sem(x: np.ndarray) -> float:
     """Standard error of the mean."""
     x = x[np.isfinite(x)]
@@ -260,24 +182,8 @@ def _sem(x: np.ndarray) -> float:
     return float(np.std(x, ddof=1) / np.sqrt(len(x)))
 
 
-def _fa_subject_medians_with_ids(
-    df_all: pd.DataFrame,
-    time_scale: float = 1.0,
-) -> pd.DataFrame:
-    """Per-subject median fixation advantage, preserving subject IDs."""
-    vals = pd.to_numeric(df_all["fixation_advantage"], errors="coerce")
-    vals = vals[np.isfinite(vals)]
-    sub_col = df_all.loc[vals.index, "subject"]
-    medians = vals.groupby(sub_col).median() * time_scale
-    return medians.reset_index().rename(
-        columns={"fixation_advantage": "median_fixation_advantage"}
-    )
-
-
 def _save_stats_csvs(
     *,
-    human_adv: pd.DataFrame,
-    nn_adv: pd.DataFrame,
     human_sweep: Dict[str, Any],
     nn_sweep: Dict[str, Any],
     out_dir: Path,
@@ -288,44 +194,7 @@ def _save_stats_csvs(
     _ensure_dir(stats_dir)
     suffix = f"_{tag}" if tag else ""
 
-    # --- CSV 1: Fixation advantage subject medians ---
-    conditions = ["all", "relevant", "irrelevant"]
-    group_configs = [
-        {"group": "human", "adv": human_adv, "time_scale": 1.0 / 1000.0},
-        {"group": "nn", "adv": nn_adv, "time_scale": 1.0},
-    ]
-    fa_rows: list = []
-    for gcfg in group_configs:
-        for cond in conditions:
-            subset = _subset_advantage(gcfg["adv"], cond)
-            meds_df = _fa_subject_medians_with_ids(subset, gcfg["time_scale"])
-            meds_df["group"] = gcfg["group"]
-            meds_df["condition"] = cond
-            fa_rows.append(meds_df)
-    fa_df = pd.concat(fa_rows, ignore_index=True)
-    fa_df = fa_df[["subject", "group", "condition", "median_fixation_advantage"]]
-    fa_path = stats_dir / f"fixation_advantage_subject_medians{suffix}.csv"
-    fa_df.to_csv(fa_path, index=False)
-    print(f"Saved: {fa_path} ({len(fa_df)} rows)")
-
-    # --- CSV 1b: Human fixation-level advantage (for hierarchical model) ---
-    time_scale_human = 1.0 / 1000.0
-    fa_fix_rows: list = []
-    for cond in conditions:
-        subset = _subset_advantage(human_adv, cond)
-        vals = pd.to_numeric(subset["fixation_advantage"], errors="coerce")
-        keep = np.isfinite(vals)
-        fa_fix_rows.append(pd.DataFrame({
-            "subject": subset.loc[keep.index[keep], "subject"],
-            "condition": cond,
-            "fixation_advantage": vals[keep] * time_scale_human,
-        }))
-    fa_fix_df = pd.concat(fa_fix_rows, ignore_index=True)
-    fa_fix_path = stats_dir / f"fixation_advantage_human_fixlevel{suffix}.csv"
-    fa_fix_df.to_csv(fa_fix_path, index=False)
-    print(f"Saved: {fa_fix_path} ({len(fa_fix_df)} rows)")
-
-    # --- CSV 2: Delta similarity by template ---
+    # --- CSV 1: Delta similarity by template ---
     template_names = ["bidirectional", "forward", "backward"]
     dsim_rows: list = []
     for group_label, sweep in [("human", human_sweep), ("nn", nn_sweep)]:
@@ -344,7 +213,7 @@ def _save_stats_csvs(
     dsim_df.to_csv(dsim_path, index=False)
     print(f"Saved: {dsim_path} ({len(dsim_df)} rows)")
 
-    # --- CSV 3: Sequence length delta ---
+    # --- CSV 2: Sequence length delta ---
     seqlen_rows: list = []
     for group_label, sweep in [("human", human_sweep), ("nn", nn_sweep)]:
         sids = sweep["subject_ids"][PANEL_ALL]
@@ -367,95 +236,7 @@ def _save_stats_csvs(
 
 
 # ---------------------------------------------------------------------------
-# Column 1: Vertical fixation advantage (All items only)
-# ---------------------------------------------------------------------------
-
-def _fa_subject_medians(
-    df_all: pd.DataFrame,
-    time_scale: float = 1.0,
-) -> np.ndarray:
-    """Compute per-subject median fixation advantage (scaled)."""
-    vals = pd.to_numeric(df_all["fixation_advantage"], errors="coerce")
-    vals = vals[np.isfinite(vals)]
-    sub_col = df_all.loc[vals.index, "subject"]
-    return vals.groupby(sub_col).median().to_numpy(dtype=float) * time_scale
-
-
-def _plot_fixation_advantage_vertical(
-    ax: plt.Axes,
-    df_all: pd.DataFrame,
-    *,
-    time_unit_label: str = "s",
-    time_scale: float = 1.0,
-    ylim: Optional[Tuple[float, float]] = None,
-    fill_color: str = ".7",
-) -> None:
-    """Vertical bar + strip of subject median fixation advantage.
-
-    *time_scale* is applied to the raw values before plotting (e.g. 1/1000
-    to convert ms -> s for human data).
-    *ylim* overrides the automatic symmetric limits if provided.
-    *fill_color* sets the bar fill color (default gray).
-    """
-    rng = np.random.default_rng(42)
-
-    sub_medians = _fa_subject_medians(df_all, time_scale)
-
-    n = len(sub_medians)
-    jitter = rng.uniform(-0.08, 0.08, size=n)
-
-    group_mean = float(np.mean(sub_medians))
-    sem_val = _sem(sub_medians)
-
-    _edge_gray = ".7"
-    _bar_w = 0.5
-
-    # Fill bar (behind dots)
-    ax.bar(0, group_mean, width=_bar_w,
-           color=fill_color, edgecolor="none", linewidth=0, zorder=2)
-    # Black outline bar (on top of dots)
-    ax.bar(0, group_mean, width=_bar_w,
-           color="none", edgecolor="black", linewidth=1.5, zorder=4)
-
-    # Individual subject dots (semi-transparent white fill, gray edge)
-    for i in range(n):
-        ax.scatter(
-            jitter[i], sub_medians[i],
-            s=6 ** 2,
-            facecolor=(1, 1, 1, 0.5),
-            edgecolor=_edge_gray,
-            linewidth=1,
-            zorder=3,
-        )
-
-    # SEM error bar (no caps, matching overview style)
-    ax.errorbar(
-        0, group_mean,
-        yerr=sem_val,
-        fmt="none",
-        ecolor="black",
-        linewidth=1.5,
-        capsize=0,
-        zorder=5,
-    )
-
-    ax.axhline(0, color="black", linestyle="-", linewidth=1.5, zorder=1)
-    ax.set_xticks([])
-    ax.set_xlim(-0.7, 0.7)  # white space around bar
-    ax.set_ylabel(f"Time advantage ({time_unit_label})")
-    ax.spines[["top", "right", "bottom"]].set_visible(False)
-
-    if ylim is not None:
-        ax.set_ylim(ylim)
-    else:
-        # Symmetric y-limits around 0
-        max_abs = float(np.nanmax(np.abs(sub_medians))) if len(sub_medians) > 0 else 1.0
-        margin = max_abs * 0.1
-        ax.set_ylim(-(max_abs + margin), max_abs + margin)
-
-
-# ---------------------------------------------------------------------------
-# Column 2: Heatmap + bidirectional delta-similarity
+# Column 1: Heatmap + bidirectional delta-similarity
 # ---------------------------------------------------------------------------
 
 def _plot_single_heatmap(
@@ -550,7 +331,7 @@ def _plot_single_delta_similarity(
     ylim: Optional[Tuple[float, float]] = None,
     yticks: Optional[Sequence[float]] = None,
 ) -> None:
-    """Bar + strip of per-subject bidirectional delta-similarity (styled like fixation advantage)."""
+    """Bar + strip of per-subject bidirectional delta-similarity."""
     y = np.asarray(delta_vals, dtype=float)
     y = y[np.isfinite(y)]
 
@@ -599,7 +380,7 @@ def _plot_single_delta_similarity(
 
 
 # ---------------------------------------------------------------------------
-# Column 3: Run-length delta bars
+# Column 2: Run-length delta bars
 # ---------------------------------------------------------------------------
 
 def _plot_single_runlength_delta(
@@ -650,220 +431,6 @@ def _plot_single_runlength_delta(
 
 
 # ---------------------------------------------------------------------------
-# Supplement 1: Transition Supplement (forward / backward)
-# ---------------------------------------------------------------------------
-
-def _create_transition_supplement(
-    *,
-    human_sweep: Dict[str, Any],
-    nn_sweep: Dict[str, Any],
-    templates: Dict[str, np.ndarray],
-    out_dir: Path,
-    tag: str = "",
-    show: bool = True,
-) -> Path:
-    """2 rows (Humans/Network) x 2 cols (Forward/Backward) transition figure."""
-
-    plt.rcParams["axes.linewidth"] = 2
-    plt.rcParams["xtick.major.width"] = 2
-    plt.rcParams["ytick.major.width"] = 2
-
-    with plt.rc_context({
-        "font.family": "Arial",
-        "axes.labelsize": 22,
-        "axes.titlesize": 22,
-        "xtick.labelsize": 16,
-        "ytick.labelsize": 16,
-        "hatch.linewidth": 1.5,
-    }):
-        fig = plt.figure(figsize=(12, 8.5))
-        gs_outer = fig.add_gridspec(2, 2, hspace=0.55, wspace=0.55)
-
-        # Shared heatmap color scale
-        all_vals = []
-        for tname in ("forward", "backward"):
-            t = templates[tname]
-            finite = t[np.isfinite(t)]
-            if finite.size > 0:
-                all_vals.append(finite)
-        hm_vmax = max(1e-6, float(np.nanmax(np.concatenate(all_vals)))) if all_vals else 1.0
-
-        col_templates = ["forward", "backward"]
-        col_titles = ["Forward", "Backward"]
-
-        row_configs = [
-            {"label": "Humans", "sweep": human_sweep,
-             "ds_ylim": (0, 1), "ds_yticks": [0, 0.5, 1]},
-            {"label": "Network", "sweep": nn_sweep,
-             "ds_ylim": (0, 0.2), "ds_yticks": [0, 0.1, 0.2]},
-        ]
-
-        for r, cfg in enumerate(row_configs):
-            sweep = cfg["sweep"]
-            row_axes = []
-            for c, (tname, ctitle) in enumerate(zip(col_templates, col_titles)):
-                gs_cell = gs_outer[r, c].subgridspec(
-                    1, 2, wspace=1.2, width_ratios=[1, 0.4],
-                )
-                ax_template = fig.add_subplot(gs_cell[0, 0])
-                ax_delta = fig.add_subplot(gs_cell[0, 1])
-
-                divider_tmpl = make_axes_locatable(ax_template)
-                ax_cbar_tmpl = divider_tmpl.append_axes("right", size="5%", pad=0.08)
-                _plot_single_heatmap(
-                    ax_template, templates[tname],
-                    cmap="viridis",
-                    title=ctitle if r == 0 else "",
-                    vmin=0.0, vmax=0.5,
-                    mask_diagonal=True,
-                    cbar=True,
-                    cbar_ax=ax_cbar_tmpl,
-                )
-                ax_cbar_tmpl.set_yticks([0.0, 0.25, 0.5])
-                ax_cbar_tmpl.set_yticklabels(["0.00", "0.25", "0.50"])
-                ax_cbar_tmpl.tick_params(labelsize=14)
-
-                delta = sweep["delta_similarity"][PANEL_ALL][tname]
-                _plot_single_delta_similarity(
-                    ax_delta, delta,
-                    ylabel="Sim. (Obs. \u2212 Chance)",
-                    ylim=cfg["ds_ylim"], yticks=cfg["ds_yticks"],
-                )
-                row_axes.extend([ax_template, ax_delta])
-            cfg["_axes"] = row_axes
-
-        # Row titles
-        fig.canvas.draw()
-        for cfg in row_configs:
-            all_ax = cfg["_axes"]
-            positions = [a.get_position() for a in all_ax]
-            x_center = (min(p.x0 for p in positions) + max(p.x1 for p in positions)) / 2
-            y_top = max(p.y1 for p in positions) + 0.04
-            fig.text(x_center, y_top, cfg["label"],
-                     fontsize=26, fontweight="normal",
-                     ha="center", va="bottom", transform=fig.transFigure)
-
-        suffix = f"_{tag}" if tag else ""
-        out_path = out_dir / f"FigureTransitionSupplement{suffix}.pdf"
-        fig.savefig(out_path, bbox_inches="tight", pad_inches=0.1)
-        if show:
-            plt.show()
-        else:
-            plt.close(fig)
-
-    print(f"Saved: {out_path}")
-    return out_path
-
-
-# ---------------------------------------------------------------------------
-# Supplement 2: Advantage Supplement (Relevant / Irrelevant)
-# ---------------------------------------------------------------------------
-
-def _create_advantage_supplement(
-    *,
-    human_adv: pd.DataFrame,
-    nn_adv: pd.DataFrame,
-    out_dir: Path,
-    tag: str = "",
-    show: bool = True,
-) -> Path:
-    """Side-by-side Relevant/Irrelevant fixation advantage (Humans | Network)."""
-
-    plt.rcParams["axes.linewidth"] = 2
-    plt.rcParams["xtick.major.width"] = 2
-    plt.rcParams["ytick.major.width"] = 2
-
-    categories = ["Relevant", "Irrelevant"]
-    cat_colors = [FA_COLORS["Relevant"], FA_COLORS["Irrelevant"]]
-
-    group_configs = [
-        {"label": "Humans", "adv": human_adv,
-         "time_unit": "s", "time_scale": 1.0 / 1000.0},
-        {"label": "Network", "adv": nn_adv,
-         "time_unit": "steps", "time_scale": 1.0},
-    ]
-
-    # Compute shared y-limits from human data
-    h_all_medians = []
-    for cat in categories:
-        subset = _subset_advantage(human_adv, cat.lower())
-        meds = _fa_subject_medians(subset, 1.0 / 1000.0)
-        h_all_medians.append(meds)
-    h_combined = np.concatenate(h_all_medians)
-    max_abs = float(np.nanmax(np.abs(h_combined))) if len(h_combined) > 0 else 1.0
-    margin = max_abs * 0.1
-    shared_ylim = (-(max_abs + margin), max_abs + margin)
-
-    with plt.rc_context({
-        "font.family": "Arial",
-        "axes.labelsize": 22,
-        "axes.titlesize": 22,
-        "xtick.labelsize": 16,
-        "ytick.labelsize": 16,
-    }):
-        fig, axes = plt.subplots(1, 2, figsize=(9, 5))
-        fig.subplots_adjust(wspace=0.4)
-
-        rng = np.random.default_rng(42)
-        _bar_w = 0.5
-        _edge_gray = ".7"
-        xs = np.arange(len(categories), dtype=float)
-
-        for ax, gcfg in zip(axes, group_configs):
-            for i, (cat, color) in enumerate(zip(categories, cat_colors)):
-                subset = _subset_advantage(gcfg["adv"], cat.lower())
-                sub_medians = _fa_subject_medians(subset, gcfg["time_scale"])
-                n = len(sub_medians)
-                group_mean = float(np.mean(sub_medians))
-                sem_val = _sem(sub_medians)
-
-                jitter = rng.uniform(-0.08, 0.08, size=n)
-
-                # Fill bar
-                ax.bar(xs[i], group_mean, width=_bar_w,
-                       color=color, edgecolor="none", linewidth=0, zorder=2)
-                # Black outline bar
-                ax.bar(xs[i], group_mean, width=_bar_w,
-                       color="none", edgecolor="black", linewidth=1.5, zorder=4)
-                # Subject dots
-                for j in range(n):
-                    ax.scatter(
-                        xs[i] + jitter[j], sub_medians[j],
-                        s=6 ** 2,
-                        facecolor=(1, 1, 1, 0.5),
-                        edgecolor=_edge_gray,
-                        linewidth=1,
-                        zorder=3,
-                    )
-                # SEM error bar
-                ax.errorbar(
-                    xs[i], group_mean, yerr=sem_val,
-                    fmt="none", ecolor="black",
-                    linewidth=1.5, capsize=0, zorder=5,
-                )
-
-            ax.axhline(0, color="black", linestyle="-", linewidth=1.5, zorder=1)
-            ax.set_xticks(xs)
-            ax.set_xticklabels(categories)
-            ax.set_xlim(xs[0] - 0.7, xs[-1] + 0.7)
-            ax.set_ylim(shared_ylim)
-            ax.set_ylabel(f"Time advantage ({gcfg['time_unit']})")
-            ax.set_title(gcfg["label"], fontsize=26, fontweight="normal")
-            ax.spines[["top", "right"]].set_visible(False)
-
-        suffix = f"_{tag}" if tag else ""
-        out_path = out_dir / f"FigureAdvantageSupplement{suffix}.pdf"
-        fig.savefig(out_path, bbox_inches="tight", pad_inches=0.1)
-        if show:
-            plt.show()
-        else:
-            plt.close(fig)
-
-    print(f"Saved: {out_path}")
-    return out_path
-
-
-# ---------------------------------------------------------------------------
 # Main figure assembly
 # ---------------------------------------------------------------------------
 
@@ -906,39 +473,15 @@ def create_figure(
     )
 
     # ------------------------------------------------------------------
-    # Step 2: Compute (or load cached) fixation advantage
-    # ------------------------------------------------------------------
-    human_adv = _load_or_compute_fa(
-        cache_root=_REPO_ROOT,
-        data_dir=_REPO_ROOT / "data",
-        excluded_subjects=("107", "131"),
-        label="human",
-    )
-    h_all = _subset_advantage(human_adv, "all")
-
-    nn_data_dir = nn_root / "data"
-    if not nn_data_dir.exists():
-        nn_data_dir = nn_root / "output"
-    nn_adv = _load_or_compute_fa(
-        cache_root=nn_root,
-        data_dir=nn_data_dir,
-        excluded_subjects=(),
-        label="NN",
-    )
-    n_all = _subset_advantage(nn_adv, "all")
-
-    # ------------------------------------------------------------------
-    # Step 3: Get bidirectional template
+    # Step 2: Get bidirectional template
     # ------------------------------------------------------------------
     templates = sweep_template_matrices(n_items=6)
     bi_template = templates["bidirectional"]
 
     # ------------------------------------------------------------------
-    # Step 4: Save per-subject CSVs for statistical testing
+    # Step 3: Save per-subject CSVs for statistical testing
     # ------------------------------------------------------------------
     _save_stats_csvs(
-        human_adv=human_adv,
-        nn_adv=nn_adv,
         human_sweep=human_sweep,
         nn_sweep=nn_sweep,
         out_dir=out_dir,
@@ -962,17 +505,10 @@ def create_figure(
         "ytick.labelsize": 16,
         "hatch.linewidth": 1.5,
     }):
-        fig = plt.figure(figsize=(17.5, 12))
-        # Outer grid: [heatmaps+run-length | fixation_advantage]. Figure is
-        # widened to give room for (a) the added colorbar next to each
-        # observed heatmap, (b) a wider run-length column, and (c) a bit
-        # more breathing room between the middle and final columns.
-        gs_outer = fig.add_gridspec(
-            2, 2,
-            wspace=0.0,
-            hspace=0.45,
-            width_ratios=[0.31, 3.0],
-        )
+        fig = plt.figure(figsize=(15.5, 12))
+        # Outer grid: one cell per row, each holding [heatmaps+delta-similarity
+        # | run-length].
+        gs_outer = fig.add_gridspec(2, 1, hspace=0.45)
 
         # Heatmap color scale: per-row sequential range [vmin, vmax] fitted
         # to the *off-diagonal* observed cells. The diagonal is always 0 by
@@ -999,19 +535,9 @@ def create_figure(
         hm_vmin_nn, hm_vmax_nn = _obs_offdiag_range(nn_sweep)
         hm_cmap = "viridis"
 
-        # Pre-compute shared y-limits from human data
-        human_sub_medians = _fa_subject_medians(h_all, 1.0 / 1000.0)
-        max_abs_human = float(np.nanmax(np.abs(human_sub_medians))) if len(human_sub_medians) > 0 else 1.0
-        margin_human = max_abs_human * 0.1
-        shared_fa_ylim = (-(max_abs_human + margin_human), max_abs_human + margin_human)
-
         row_configs = [
             {
                 "label": "Humans",
-                "panel_prefix": ["A", "B", "C"],
-                "time_unit": "s",
-                "time_scale": 1.0 / 1000.0,  # ms -> s
-                "fa_data": h_all,
                 "sweep": human_sweep,
                 "hm_vmin": hm_vmin_human,
                 "hm_vmax": hm_vmax_human,
@@ -1023,10 +549,6 @@ def create_figure(
             },
             {
                 "label": "Network",
-                "panel_prefix": ["D", "E", "F"],
-                "time_unit": "steps",
-                "time_scale": 1.0,
-                "fa_data": n_all,
                 "sweep": nn_sweep,
                 "hm_vmin": hm_vmin_nn,
                 "hm_vmax": hm_vmax_nn,
@@ -1040,27 +562,15 @@ def create_figure(
 
         for r, cfg in enumerate(row_configs):
             sweep = cfg["sweep"]
-            # --- Column 1: Fixation Advantage (vertical, All only) ---
-            ax_col1 = fig.add_subplot(gs_outer[r, 0])
-            _plot_fixation_advantage_vertical(
-                ax_col1, cfg["fa_data"],
-                time_unit_label=cfg["time_unit"],
-                time_scale=cfg["time_scale"],
-                ylim=shared_fa_ylim,
-            )
 
-            # --- Right side: [heatmaps+delta | run-length] with wider gap ---
-            # Ratios give the heatmaps+delta-similarity sub-column room for
-            # its new colorbar without overlapping the similarity y-label,
-            # while also bumping the run-length column up slightly so it
-            # doesn't visually shrink relative to the widened heatmap area.
-            gs_right = gs_outer[r, 1].subgridspec(
+            # Row layout: [heatmaps+delta-similarity | run-length].
+            gs_right = gs_outer[r, 0].subgridspec(
                 1, 2,
                 wspace=0.45,
                 width_ratios=[2.25, 1.2],
             )
 
-            # --- Column 2: Compound panel (heatmaps + delta similarity) ---
+            # --- Column 1: Compound panel (heatmaps + delta similarity) ---
             gs_col2 = gs_right[0, 0].subgridspec(
                 2, 2,
                 wspace=0.05,
@@ -1125,7 +635,7 @@ def create_figure(
                 ylim=cfg["ds_ylim"], yticks=cfg["ds_yticks"],
             )
 
-            # --- Column 3: Run-Length Delta Bars ---
+            # --- Column 2: Run-Length Delta Bars ---
             ax_col3 = fig.add_subplot(gs_right[0, 1])
             _plot_single_runlength_delta(
                 ax_col3,
@@ -1136,7 +646,7 @@ def create_figure(
             )
 
             # Store axes for row title placement after layout
-            cfg["_ax_left"] = ax_col1
+            cfg["_ax_left"] = ax_template
             cfg["_ax_right"] = ax_col3
 
         # Force layout so get_position() returns final coords
@@ -1156,51 +666,13 @@ def create_figure(
             )
 
         suffix = f"_{tag}" if tag else ""
-        out_path = out_dir / f"FigureNN_H_next_fixation_gen{suffix}.pdf"
+        out_path = out_dir / f"FigureFixationTransitions{suffix}.pdf"
         fig.savefig(out_path, bbox_inches="tight", pad_inches=0.1)
 
         if show:
             plt.show()
         else:
             plt.close(fig)
-
-    # ------------------------------------------------------------------
-    # Supplement figures
-    # ------------------------------------------------------------------
-    print("Building TransitionSupplement ...", flush=True)
-    trans_supp_path = _create_transition_supplement(
-        human_sweep=human_sweep,
-        nn_sweep=nn_sweep,
-        templates=templates,
-        out_dir=out_dir,
-        tag=tag,
-        show=show,
-    )
-
-    print("Building AdvantageSupplement ...", flush=True)
-    adv_supp_path = _create_advantage_supplement(
-        human_adv=human_adv,
-        nn_adv=nn_adv,
-        out_dir=out_dir,
-        tag=tag,
-        show=show,
-    )
-
-    # Sidecar metadata
-    meta_path = out_dir / f"FigureNN_H_next_fixation_gen{suffix}.meta.txt"
-    meta_path.write_text(
-        "\n".join([
-            f"nn_root={nn_root}",
-            f"tag={tag}",
-            f"n_sims={n_sims}",
-            f"seed={seed}",
-            f"human_exclude_subjects=['107','131']",
-            f"trans_supplement={trans_supp_path}",
-            f"advantage_supplement={adv_supp_path}",
-        ])
-        + "\n",
-        encoding="utf-8",
-    )
 
     print(f"Saved: {out_path}")
     return out_path
@@ -1212,7 +684,7 @@ def create_figure(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Human vs NN next-fixation-generation comparison (2x3 figure)."
+        description="Fixation-transition structure: humans vs. network (Figure S6)."
     )
     parser.add_argument(
         "--nn-root", type=str, required=True,

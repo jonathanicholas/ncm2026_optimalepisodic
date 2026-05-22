@@ -97,25 +97,14 @@ conda run -n analysis Rscript metarnn/run_mixed_effects_nn_nn_comparison.R \
   --tag "${TAGN}" \
   --out-dir "${OUTN}/output/human_vs_nn_brms"
 
-# ── Step 8: Next-fixation-generation figure ──────────────────────────────────
+# ── Step 8: Next-fixation conditional-logit pipeline (Figure 5 + S5) ──────────
 echo ""
-echo "[STEP 8/9] Human vs NN next-fixation-generation figure (inputN)"
-conda run -n analysis python metarnn/plot_NN_H_next_fixation_gen.py \
-  --nn-root "${OUTN}" \
-  --tag "${TAGN}" \
-  --n-sims 1000 \
-  --no-show
-
-# ── Step 9: Next-fixation-generation R stats ─────────────────────────────────
-echo ""
-echo "[STEP 9/9] Next-fixation-generation Bayesian mixed-effects models (inputN)"
-conda run -n analysis Rscript metarnn/run_mixed_effects_next_fixation_gen.R \
-  --nn-root "${OUTN}" \
-  --tag "${TAGN}"
+echo "[STEP 8/10] Next-fixation conditional-logit pipeline"
+bash metarnn/next_fixation/run_next_fixation.sh
 
 # ── Step 10: Evidence accumulation + belief decoding figure ──────────────────
 echo ""
-echo "[STEP 10/11] Evidence accumulation + belief decoding figure"
+echo "[STEP 9/10] Evidence accumulation + belief decoding figure"
 EVIDENCE_DIR="${OUT0}/output/evidence"
 HIDDEN_DIR="${SIM_DIR0}/with_hidden"
 DECODING_CSV="${EVIDENCE_DIR}/belief_decoding_results.csv"
@@ -148,17 +137,15 @@ else
   echo "  SKIP evidence figure — no data available"
 fi
 
-# ── Step 11: Copy figures to output/figures/ ─────────────────────────────────
+# ── Step 10: Copy figures to output/figures/ ─────────────────────────────────
 echo ""
-echo "[STEP 11/11] Copy figures to output/figures/"
+echo "[STEP 10/10] Copy figures to output/figures/"
 mkdir -p output/figures/supplementary
 
 cp "${OUTN}/output/overview/FigureNN_overview_${TAGN}.pdf" \
    output/figures/Figure3.pdf
 cp "${OUTN}/output/human_comparison/FigureNN_NN_comparison_${TAGN}_vs_input0.pdf" \
    output/figures/Figure4.pdf
-cp "${OUTN}/output/next_fixation_gen/FigureNN_H_next_fixation_gen_${TAGN}.pdf" \
-   output/figures/Figure5.pdf
 
 if [ -f "${OUT0}/output/evidence/belief_decoding_supplement.pdf" ]; then
   cp "${OUT0}/output/evidence/belief_decoding_supplement.pdf" \
@@ -166,10 +153,6 @@ if [ -f "${OUT0}/output/evidence/belief_decoding_supplement.pdf" ]; then
 fi
 cp "${OUTN}/output/overview/propDropSupplement_${TAGN}.pdf" \
    output/figures/supplementary/FigureS4.pdf
-cp "${OUTN}/output/next_fixation_gen/FigureAdvantageSupplement_${TAGN}.pdf" \
-   output/figures/supplementary/FigureS5.pdf
-cp "${OUTN}/output/next_fixation_gen/FigureTransitionSupplement_${TAGN}.pdf" \
-   output/figures/supplementary/FigureS6.pdf
 
 if [ -f "${OUT0}/output/evidence/evidence_figure.pdf" ]; then
   cp "${OUT0}/output/evidence/evidence_figure.pdf" \
@@ -178,7 +161,7 @@ fi
 
 echo ""
 echo "============================================================"
-echo "[DONE] NN pipeline complete for ${SIM_NAME} (input0 vs input${NINPUTS}) [11 steps]"
+echo "[DONE] NN pipeline complete for ${SIM_NAME} (input0 vs input${NINPUTS}) [10 steps]"
 echo "[DONE] Outputs: ${OUTN}/output/"
 echo "[DONE] Figures: output/figures/"
 echo "============================================================"

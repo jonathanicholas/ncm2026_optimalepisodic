@@ -30,7 +30,6 @@ ncm2026_optimalepisodic/
 │       ├── visualize_recall_fixation_wedges_group.py   # Group heatmaps of recall fixations
 │       ├── visualize_choice_fixation_wedges_group.py   # Choice heatmaps + contrast maps
 │       ├── visualize_first_fixations_relevance_and_magnitude.py  # First fixation patterns
-│       ├── plot_fixation_advantage_violin.py  # Violin plots of relevant vs irrelevant fixation time
 │       ├── analyze_choice_fixation_sweeps.py  # Fixation sequence/transition sweep analysis
 │       ├── compute_recall_drop_fraction.py  # Recall-calibrated fixation drop fraction
 │       └── pygazeanalyser/             #     Third-party EyeLink EDF reading library
@@ -74,10 +73,18 @@ ncm2026_optimalepisodic/
 │   ├── run_nn_pipeline.sh             #   Pipeline: process NNs -> compare -> Bayesian stats
 │   ├── create_nn_figures.sh           #   Sub-pipeline: JSON simulations -> human-like CSVs + figures
 │   ├── plot_NN_NN_comparison.py       #   Compare two NN variants (Figure 4)
-│   ├── plot_NN_H_next_fixation_gen.py #   Human vs NN next-fixation generation (Figure 5, S5, S6)
 │   ├── run_mixed_effects_human_vs_nn.R     # Bayesian models: human vs NN
 │   ├── run_mixed_effects_nn_nn_comparison.R  # Bayesian models: NN vs NN
-│   ├── run_mixed_effects_next_fixation_gen.R  # Bayesian models: fixation advantage + transitions
+│   ├── next_fixation/                 #   Next-fixation conditional-logit sub-pipeline
+│   │   ├── run_next_fixation.sh       #     Pipeline: build data -> conditional-logit fits -> Figures 5, S5
+│   │   ├── build_next_fixation_data.py  #   Build long-form candidate datasets (human, NN, nulls)
+│   │   ├── conditional_logit.stan     #     Conditional-logit model (flat)
+│   │   ├── conditional_logit_re.stan  #     Conditional-logit model (hierarchical)
+│   │   ├── fit_conditional_logit.R    #     Flat fit (NN + null oracles)
+│   │   ├── fit_conditional_logit_re.R #     Hierarchical fit (human)
+│   │   ├── plot_next_fixation_forest.py        # Next-fixation forest (Figure 5)
+│   │   ├── plot_next_fixation_nulls_forest.py  # Null-oracle forest (Figure S5)
+│   │   └── lib/                       #     Data loaders, candidate features, null oracles
 │   ├── lib/                           #   NN analysis tools
 │   │   ├── compile_nn_to_human_fixations.py  # Convert NN JSON output to human-format CSVs
 │   │   ├── analyze_NN_behavior.py     #     Compile NN behavioral summaries
@@ -121,7 +128,8 @@ ncm2026_optimalepisodic/
 │   │   ├── kfold_compare/             #     Merged CV comparisons
 │   │   ├── ppc/                       #     Posterior predictive check data
 │   │   └── parameter_recovery_sweep/  #     Recovery analysis results
-│   └── next_fixation_gen/             #   Human fixation generation analysis cache
+│   ├── next_fixation/                 #   Next-fixation conditional-logit datasets + beta CSVs
+│   └── next_fixation_gen/             #   Fixation-transition sweep cache (Figure S6)
 │
 ├── supplemental_analysis/             # Supplementary robustness checks
 │   ├── feature_analysis/              #   Per-feature-dimension robustness
@@ -132,13 +140,17 @@ ncm2026_optimalepisodic/
 │   │       ├── FigureS7.pdf           #       Figure S7 (also copied to output/figures/supplementary/)
 │   │       ├── feature_deviation_from_mean.csv
 │   │       └── model_summaries/
-│   └── block_analysis/                #   Block-number (round) interaction check
-│       ├── run_block_analysis.sh      #     Pipeline: data -> 9 brms fits -> TableS8
-│       ├── scripts/                   #     build, compute scripts
-│       ├── data/                      #     Intermediate per-trial CSVs
-│       └── output/
-│           ├── block_interaction_table.csv   #  Table S8 rows (one per analysis)
-│           └── model_summaries/
+│   ├── block_analysis/                #   Block-number (round) interaction check
+│   │   ├── run_block_analysis.sh      #     Pipeline: data -> 9 brms fits -> TableS8
+│   │   ├── scripts/                   #     build, compute scripts
+│   │   ├── data/                      #     Intermediate per-trial CSVs
+│   │   └── output/
+│   │       ├── block_interaction_table.csv   #  Table S8 rows (one per analysis)
+│   │       └── model_summaries/
+│   └── fixation_transitions/          #   Fixation-transition structure (Figure S6)
+│       ├── run_fixation_transitions.sh         # Pipeline: transition figure + Bayesian stats
+│       ├── plot_fixation_transitions.py        # Transition-matrix + sequence-length figure (Figure S6)
+│       └── run_mixed_effects_fixation_transitions.R  # Bayesian models: delta similarity + sequence length
 │
 ├── task/
 │   └── emdm-eyetracking/
@@ -248,14 +260,15 @@ create_nn_figures.sh (input0 baseline)
   --> plot_NN_NN_comparison.py
   --> export_nn_nn_comparison_data.py
   --> run_mixed_effects_nn_nn_comparison.R
-  --> plot_NN_H_next_fixation_gen.py
-  --> run_mixed_effects_next_fixation_gen.R
+  --> next_fixation/run_next_fixation.sh
   --> copy figures to output/figures/
 ```
 
 `create_nn_figures.sh` internally runs: JSON compilation, fixation preparation, choice fixation proportions, choice prediction (with recall-calibrated drop), prop-drop supplement, NN overview, and human-NN comparison figures. The pipeline also runs belief decoding (decoding metalevel MDP belief states from the network's hidden states via ordinary least squares linear regression, with 5-fold GroupKFold by trial) and generates the evidence accumulation figure (Figure 3, panels B-C) and the belief-decoding supplement (Figure S3) if simulation files with hidden states are available in `simulation_*/with_hidden/`. Pre-computed outputs are cached so the figure can be regenerated without the large JSON files.
 
-**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/figures/Figure3-5.pdf`, `output/figures/Figure3BC.pdf`, `output/figures/supplementary/FigureS3-S6.pdf`
+`next_fixation/run_next_fixation.sh` builds long-form candidate datasets for humans, the prior-memory network, and two null oracles (adjacent-walk, uniform-random), fits conditional-logit models (hierarchical for humans, flat for the network and nulls), and produces the next-fixation forest (Figure 5) and the null-oracle forest (Figure S5). MCMC fits are cached and skipped if their beta CSVs already exist.
+
+**Outputs:** `metarnn/simulations/human_like_*/output/`, `output/next_fixation/`, `output/figures/Figure3-5.pdf`, `output/figures/Figure3BC.pdf`, `output/figures/supplementary/FigureS3-S5.pdf`
 
 ### 6. Feature-dimension robustness (`supplemental_analysis/feature_analysis/run_feature_analysis.sh`)
 
@@ -281,6 +294,18 @@ build_choices.py
 ```
 
 **Outputs:** `supplemental_analysis/block_analysis/output/block_interaction_table.csv`, `.../model_summaries/*.{txt,csv}`
+
+### 8. Fixation-transition structure (`supplemental_analysis/fixation_transitions/run_fixation_transitions.sh <SIM_NAME> <NINPUTS>`)
+
+Compares the transition-matrix structure and consecutive-fixation-sequence lengths of humans against the prior-memory network, with accompanying Bayesian mixed-effects statistics. Depends on the `human_like_*` exports, so run it after Pipeline 4.
+
+```
+plot_fixation_transitions.py            (FigureS6.pdf)
+  --> run_mixed_effects_fixation_transitions.R   (delta similarity + sequence length)
+  --> copy figure to output/figures/supplementary/
+```
+
+**Outputs:** `output/figures/supplementary/FigureS6.pdf`, `metarnn/simulations/human_like_*/output/next_fixation_gen/stats/*.{csv,txt}`
 
 ---
 
@@ -308,7 +333,7 @@ install.packages(c("brms", "readr", "dplyr", "tidyr", "broom.mixed"))
 
 ### Reproducing Results
 
-Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`. Pipelines 6 and 7 (feature-dimension and block-number robustness) depend on the eye-tracking CSV produced by Pipeline 2, and Pipeline 7 additionally reads the behavioral memory CSVs produced by Pipeline 1.
+Pipelines 1-3 (behavioral, eye-tracking, aDDM) are independent and can be run in any order. Pipeline 4 (NN) depends on outputs from Pipeline 2 (eye-tracking), specifically files in `output/eyegaze/stats/` and `output/eyegaze/recall/`. Pipelines 6 and 7 (feature-dimension and block-number robustness) depend on the eye-tracking CSV produced by Pipeline 2, and Pipeline 7 additionally reads the behavioral memory CSVs produced by Pipeline 1. Pipeline 8 (fixation-transition structure) depends on the `human_like_*` exports produced by Pipeline 4.
 
 Pre-computed outputs are included in `output/` and `metarnn/simulations/human_like_*/output/`, so results can be inspected without re-running.
 
@@ -333,6 +358,9 @@ bash supplemental_analysis/feature_analysis/run_feature_analysis.sh
 
 # Pipeline 7: Block-number (round) robustness
 bash supplemental_analysis/block_analysis/run_block_analysis.sh
+
+# Pipeline 8: Fixation-transition structure (run after Pipeline 4)
+bash supplemental_analysis/fixation_transitions/run_fixation_transitions.sh 04_04 5
 ```
 
 ### Notes
@@ -355,13 +383,13 @@ All manuscript figures are collected in `output/figures/` (main) and `output/fig
 | Figure 3 (D-J) | NN overview | `metarnn/lib/plot_NN_overview.py` |
 | Figure 3 (B-C) | Evidence accumulation + belief decoding | `metarnn/lib/plot_evidence_figure.py` + `metarnn/lib/run_belief_decoding.py` |
 | Figure 4 | NN-NN comparison | `metarnn/plot_NN_NN_comparison.py` |
-| Figure 5 | Next-fixation generation | `metarnn/plot_NN_H_next_fixation_gen.py` |
+| Figure 5 | Next-fixation conditional-logit forest | `metarnn/next_fixation/plot_next_fixation_forest.py` |
 | Figure S1 | Behavioral supplement | `analysis/analyze_behavior.py` |
 | Figure S2 | aDDM supplement | `addm/plot_addm_supplement.py` |
 | Figure S3 | Belief decoding supplement | `metarnn/lib/plot_evidence_figure.py` + `metarnn/lib/run_belief_decoding.py` |
 | Figure S4 | Fixation drop supplement | `metarnn/lib/plot_prop_drop_supplement.py` |
-| Figure S5 | Advantage supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
-| Figure S6 | Transition supplement | `metarnn/plot_NN_H_next_fixation_gen.py` |
+| Figure S5 | Next-fixation null-oracle forest | `metarnn/next_fixation/plot_next_fixation_nulls_forest.py` |
+| Figure S6 | Fixation-transition structure | `supplemental_analysis/fixation_transitions/plot_fixation_transitions.py` |
 | Figure S7 | Per-feature-dimension robustness | `supplemental_analysis/feature_analysis/scripts/plot_feature_deviation.py` |
 
 ---

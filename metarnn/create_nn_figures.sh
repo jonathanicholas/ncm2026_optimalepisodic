@@ -74,7 +74,6 @@ fi
 # Output subdirectories under OUT_ROOT/output/
 OVERVIEW_DIR="${OUT_ROOT}/output/overview"
 HCOMP_DIR="${OUT_ROOT}/output/human_comparison"
-NEXT_FIX_DIR="${OUT_ROOT}/output/next_fixation_gen"
 NN_EYEGAZE_STATS="${OUT_ROOT}/output/eyegaze/stats"
 
 PRED_SUMMARY_CSV="${NN_EYEGAZE_STATS}/summary_prop_time_location_interactions_true_all_norm-within.csv"

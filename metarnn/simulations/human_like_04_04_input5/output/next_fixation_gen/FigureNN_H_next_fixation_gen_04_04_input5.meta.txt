@@ -1,7 +1,0 @@
-nn_root=/Users/jonathannicholas/postdoc/mattarlab/manuscripts/emdm-eye/ncm2026_optimalepisodic/metarnn/simulations/human_like_04_04_input5
-tag=04_04_input5
-n_sims=1000
-seed=123
-human_exclude_subjects=['107','131']
-trans_supplement=/Users/jonathannicholas/postdoc/mattarlab/manuscripts/emdm-eye/ncm2026_optimalepisodic/metarnn/simulations/human_like_04_04_input5/output/next_fixation_gen/FigureTransitionSupplement_04_04_input5.pdf
-advantage_supplement=/Users/jonathannicholas/postdoc/mattarlab/manuscripts/emdm-eye/ncm2026_optimalepisodic/metarnn/simulations/human_like_04_04_input5/output/next_fixation_gen/FigureAdvantageSupplement_04_04_input5.pdf
