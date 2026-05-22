@@ -6,7 +6,7 @@
 #
 # Usage (from repo root):
 #   Rscript metarnn/next_fixation/fit_conditional_logit.R <dataset>
-# where <dataset> is one of: rnn_input5_500k, walk_mixed_10x, random_10x
+# where <dataset> is one of: rnn_input5_500k, walk_ring_noisy_10x, random_10x
 
 suppressPackageStartupMessages({
   library(rstan)

@@ -4,9 +4,11 @@ null oracles.
 Same ten z-scored predictors and category bands as the main next-fixation
 forest (Figure 5), here fit to an adjacent-walk null and a uniform-random
 null. Both nulls are matched to the human trial-length distribution and
-resampled 10x. They show no resource-rational or encoding-order structure,
-confirming that the effects in humans and the network arise from the
-deliberation policy itself rather than from fixation statistics.
+resampled 10x. The adjacent walk shows only spatial-distance and
+return-to-previous structure; neither null shows the inverse-relevant-
+fixation-time or encoding-order effects seen in humans and the network,
+confirming those arise from the deliberation policy rather than from
+fixation statistics.
 
 Usage (from repo root):
   python metarnn/next_fixation/plot_next_fixation_nulls_forest.py
@@ -73,7 +75,7 @@ def load_betas(beta_csv):
 
 
 def main():
-    walk = load_betas("conditional_logit_walk_mixed_10x_beta.csv")
+    walk = load_betas("conditional_logit_walk_ring_noisy_10x_beta.csv")
     rand = load_betas("conditional_logit_random_10x_beta.csv")
 
     n = len(PREDICTOR_ORDER)

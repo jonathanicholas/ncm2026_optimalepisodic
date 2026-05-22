@@ -35,6 +35,14 @@ def _expand_trials(trials: pd.DataFrame, n_repeats: int) -> pd.DataFrame:
     return pd.DataFrame(rows).reset_index(drop=True)
 
 
+def _randomize_encoding_order(trials: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
+    trials = trials.reset_index(drop=True).copy()
+    trials["encoding_order_slots"] = [
+        rng.permutation(NUM_SLOTS).tolist() for _ in range(len(trials))
+    ]
+    return trials
+
+
 def random_oracle(
     trials: pd.DataFrame,
     fixations: pd.DataFrame,
@@ -85,15 +93,23 @@ def random_oracle(
     )
 
 
-def walk_mixed(
+def walk_ring_noisy(
     trials: pd.DataFrame,
     fixations: pd.DataFrame,
     *,
     seed: int = 0,
     n_repeats: int = 1,
+    p_random: float = 0.1,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Mixed policy: 1/3 step +1 (cw), 1/3 step -1 (ccw),
-    1/3 uniform random over slots != current. Matched fixation counts.
+    """Adjacent ring walk with a small random-jump probability.
+
+    At each step, with probability ``1 - p_random`` take an adjacent +1/-1 step
+    around the ring (direction drawn fresh each step); with probability
+    ``p_random`` jump to a uniformly random slot != current. The random jumps
+    break the quasi-complete separation on spatial distance that a pure ring
+    walk produces, keeping the distance coefficient finite. Each synthetic
+    trial's encoding order is re-randomized (the walk is encoding-blind), so the
+    encoding-order predictors are an exact null. Matched fixation counts.
     """
 
     rng = np.random.default_rng(seed)
@@ -120,18 +136,15 @@ def walk_mixed(
                     "fix_duration": 1.0,
                     "is_relevant": int(is_rel[slot]),
                 })
-                u = rng.random()
-                if u < 1.0 / 3.0:
-                    slot = (slot + 1) % NUM_SLOTS
-                elif u < 2.0 / 3.0:
-                    slot = (slot - 1) % NUM_SLOTS
-                else:
+                if rng.random() < p_random:
                     choices = [s for s in range(NUM_SLOTS) if s != slot]
                     slot = int(rng.choice(choices))
+                else:
+                    step = -1 if rng.random() < 0.5 else 1
+                    slot = (slot + step) % NUM_SLOTS
     fixs = pd.DataFrame.from_records(records, columns=FIXATION_COLUMNS)
     keep_ids = set(fixs["trial_id"])
     expanded = _expand_trials(trials, n_repeats)
-    return (
-        expanded[expanded["trial_id"].isin(keep_ids)].reset_index(drop=True),
-        fixs,
-    )
+    expanded = expanded[expanded["trial_id"].isin(keep_ids)].reset_index(drop=True)
+    expanded = _randomize_encoding_order(expanded, rng)
+    return (expanded, fixs)

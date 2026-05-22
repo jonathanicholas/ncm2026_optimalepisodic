@@ -19,7 +19,7 @@ mkdir -p "${OUT_DIR}" output/figures/supplementary
 echo "[STEP 1/4] Build next-fixation candidate datasets"
 if [ -f "${OUT_DIR}/next_fixation_long_human.csv" ] \
    && [ -f "${OUT_DIR}/next_fixation_long_rnn_input5_500k.csv" ] \
-   && [ -f "${OUT_DIR}/next_fixation_long_walk_mixed_10x.csv" ] \
+   && [ -f "${OUT_DIR}/next_fixation_long_walk_ring_noisy_10x.csv" ] \
    && [ -f "${OUT_DIR}/next_fixation_long_random_10x.csv" ]; then
   echo "  SKIP — all four long-form CSVs already exist"
 else
@@ -36,7 +36,7 @@ else
   conda run -n analysis Rscript metarnn/next_fixation/fit_conditional_logit_re.R
 fi
 
-for DATASET in rnn_input5_500k walk_mixed_10x random_10x; do
+for DATASET in rnn_input5_500k walk_ring_noisy_10x random_10x; do
   if [ -f "${OUT_DIR}/conditional_logit_${DATASET}_beta.csv" ]; then
     echo "  SKIP ${DATASET} — beta CSV exists"
   else
