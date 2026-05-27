@@ -151,6 +151,7 @@ class CoefDist:
 @dataclass(frozen=True)
 class ChanceAccSummary:
     mean: float
+    sd: float
     lo: float
     hi: float
     p95: float
@@ -1995,8 +1996,11 @@ def simulate_chance_accuracy(
     sim_acc = np.full(n_sims, np.nan, dtype=float)
     sim_coef = np.full((n_sims, len(x_cols)), np.nan, dtype=float)
     for s in range(n_sims):
-        # Generate all permutations at once: one per trial.
-        perms = np.array([rng.permutation(6) for _ in range(n_trials)])  # (n_trials, 6)
+        # Generate all permutations at once: argsort of uniform random keys gives
+        # a uniform random permutation per row, equivalent to but much faster than
+        # a Python-level loop of rng.permutation(6) calls.
+        keys = rng.random((n_trials, 6))
+        perms = np.argsort(keys, axis=1)  # (n_trials, 6)
         row_idx = np.arange(n_trials)[:, None]
         vals_p = vals_all[row_idx, perms]
         rels_p = rels_all[row_idx, perms]
@@ -2283,10 +2287,12 @@ def main():
                 regularization=args.regularization,
             )
             sim_acc_samps = sim_acc
-            # one-sided permutation p-value (accuracy >= observed)
+            # one-sided permutation p-value (proportion of permuted accuracies
+            # at or above the observed accuracy; uncorrected empirical estimate)
             obs = cv.mean
-            p_perm = float((1.0 + np.sum(sim_acc >= obs)) / (len(sim_acc) + 1.0))
-            chance_summary = ChanceAccSummary(mean=mu, lo=lo, hi=hi, p95=p95, p_perm=p_perm)
+            p_perm = float(np.mean(sim_acc >= obs))
+            sd = float(np.nanstd(sim_acc))
+            chance_summary = ChanceAccSummary(mean=mu, sd=sd, lo=lo, hi=hi, p95=p95, p_perm=p_perm)
 
         # Cache a compact summary CSV for downstream composite figures.
         summary_rows: List[dict] = []
@@ -2310,6 +2316,7 @@ def main():
             base_row.update(
                 {
                     "perm_mean": float(chance_summary.mean),
+                    "perm_sd": float(chance_summary.sd),
                     "perm_lo": float(chance_summary.lo),
                     "perm_hi": float(chance_summary.hi),
                     "perm_p95": float(chance_summary.p95),
@@ -2359,6 +2366,17 @@ def main():
         )
         _write_summary_csv(summary_path, summary_rows)
         print(f"Saved summary CSV: {summary_path}")
+
+        if sim_acc_samps is not None:
+            perm_null_path = os.path.join(
+                args.out_dir,
+                f"perm_null_prop_time_{args.feature_set}_{value_source}_{vt_tag}_norm-{args.visit_normalization}.csv",
+            )
+            pd.DataFrame({
+                "perm": np.arange(len(sim_acc_samps), dtype=int),
+                "cv_accuracy": np.asarray(sim_acc_samps, dtype=float),
+            }).to_csv(perm_null_path, index=False)
+            print(f"Saved permutation null CSV: {perm_null_path}")
 
         coef_table_path = os.path.join(
             args.out_dir,

@@ -23,6 +23,7 @@
 # Options (environment variables):
 #   MAX_PARALLEL=4       max parallel subject jobs (default: 4)
 #   N_BOOTSTRAP=1000     bootstrap replicates for CV model CIs (default: 1000)
+#   N_SIMS=10000         within-trial permutation null replicates (default: 10000)
 #   SKIP_SUBJECTS=false  skip per-subject steps if outputs exist (default: false)
 
 set -euo pipefail
@@ -34,6 +35,7 @@ cd "$BASE_DIR"
 
 MAX_PARALLEL="${MAX_PARALLEL:-4}"
 N_BOOTSTRAP="${N_BOOTSTRAP:-1000}"
+N_SIMS="${N_SIMS:-10000}"
 SKIP_SUBJECTS="${SKIP_SUBJECTS:-false}"
 ROI_TYPE="original"
 BUFFER_SIZE=50
@@ -137,7 +139,7 @@ python analysis/lib/predict_choice_from_item_prop_time_interactions.py \
     --feature-set location_interactions \
     --visit-type all \
     --n-bootstrap "$N_BOOTSTRAP" \
-    --n-sims 0
+    --n-sims "$N_SIMS"
 echo "[DONE] predict_choice_from_item_prop_time_interactions.py"
 
 # ─────────────────────────────────────────────────────
