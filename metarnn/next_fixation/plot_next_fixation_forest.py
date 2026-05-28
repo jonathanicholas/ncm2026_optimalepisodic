@@ -20,10 +20,15 @@ import matplotlib.transforms as mtransforms
 from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 mpl.rcParams["font.family"] = "Arial"
 mpl.rcParams["pdf.fonttype"] = 42
 mpl.rcParams["ps.fonttype"] = 42
+mpl.rcParams["axes.linewidth"] = 2
+mpl.rcParams["xtick.major.width"] = 2
+mpl.rcParams["ytick.major.width"] = 2
+sns.set_context("poster")
 
 OUT = Path(__file__).resolve().parents[2] / "output" / "next_fixation"
 
@@ -43,7 +48,7 @@ PREDICTOR_ORDER = [
 LABELS = {
     "share_k_z":            "Inverse Relevant Fix. Time",
     "dist_cw_z":            "Spatial Distance (clockwise)",
-    "dist_ccw_z":           "Spatial Distance (counter-cw)",
+    "dist_ccw_z":           "Spatial Distance (counter)",
     "enc_lag_fwd_z":        "Temporal Distance (forward)",
     "enc_lag_bwd_z":        "Temporal Distance (backward)",
     "is_primacy_k_z":       "Primacy",
@@ -61,7 +66,7 @@ GROUPS = [
     ("Encoding Order",
      ["enc_lag_fwd_z", "enc_lag_bwd_z", "is_primacy_k_z", "is_recency_k_z"],
      {"human": "#64B5F6", "rnn": "#BBDEFB", "band": "#42A5F5"}),
-    ("Heuristic Biases",
+    ("Heuristics & Biases",
      ["abs_reward_k_z", "signed_reward_k_z", "is_prev_fixation_k_z"],
      {"human": "#FF8A65", "rnn": "#FFCCBC", "band": "#FF7043"}),
 ]
@@ -90,7 +95,7 @@ def main():
     y_idx = {p: y_base[i] for i, p in enumerate(PREDICTOR_ORDER)}
     offset = 0.18
 
-    fig, ax = plt.subplots(1, 1, figsize=(6, 6.5))
+    fig, ax = plt.subplots(1, 1, figsize=(11, 14))
 
     series = [("human", human, +offset if rnn is not None else 0.0)]
     if rnn is not None:
@@ -103,7 +108,7 @@ def main():
         y_center = y_idx[predictor] + offset
         jitter = rng.uniform(-0.06, 0.06, size=len(sub))
         ax.scatter(sub["mean"], y_center + jitter,
-                   s=24, color=PRIMARY[predictor][1]["human"],
+                   s=90, color=PRIMARY[predictor][1]["human"],
                    alpha=0.35, edgecolor="none", zorder=2)
 
     # Population fixed-effect markers.
@@ -116,9 +121,9 @@ def main():
             y = y_idx[predictor] + shift
             ax.errorbar(mean, y,
                         xerr=[[mean - lo], [hi - mean]],
-                        fmt="o", color=c[which], markersize=9,
-                        markeredgecolor="black", markeredgewidth=1.5,
-                        ecolor="black", elinewidth=1.5,
+                        fmt="o", color=c[which], markersize=18,
+                        markeredgecolor="black", markeredgewidth=3.0,
+                        ecolor="black", elinewidth=3.0,
                         capsize=0, zorder=3)
 
     ax.axvline(0, ls=":", color="black", alpha=0.8, zorder=1)
@@ -127,8 +132,10 @@ def main():
     ax.set_yticklabels([LABELS[p] for p in PREDICTOR_ORDER])
     for tick in ax.get_yticklabels():
         tick.set_color("black")
+    ax.tick_params(axis="y", labelsize=21)
 
-    ax.set_xlabel("Effect on next fixation probability (log odds)")
+    ax.set_xlabel("Effect on next location probability (log odds)", fontsize=24)
+    ax.tick_params(axis="x", labelsize=22)
     xmin, xmax = ax.get_xlim()
     ax.set_xlim(xmin, xmax + 0.18)
     ax.spines["top"].set_visible(False)
@@ -136,26 +143,26 @@ def main():
 
     legend_handles = [
         plt.Line2D([0], [0], marker="o", linestyle="none",
-                   markerfacecolor="#444", markersize=9,
-                   markeredgecolor="black", markeredgewidth=1.0,
+                   markerfacecolor="#444", markersize=18,
+                   markeredgecolor="black", markeredgewidth=1.5,
                    label="Humans"),
     ]
     if rnn is not None:
         legend_handles.append(
             plt.Line2D([0], [0], marker="o", linestyle="none",
-                       markerfacecolor="#bbb", markersize=9,
-                       markeredgecolor="black", markeredgewidth=1.0,
+                       markerfacecolor="#bbb", markersize=18,
+                       markeredgecolor="black", markeredgewidth=1.5,
                        label="Network"))
-    ax.legend(handles=legend_handles, fontsize=9, loc="upper right",
+    ax.legend(handles=legend_handles, fontsize=18, loc="upper right",
               bbox_to_anchor=(0.99, 0.98), frameon=True, fancybox=False,
               facecolor="white", edgecolor="black", handletextpad=0.3)
-    ax.set_title("Predictors of next fixation", fontsize=11)
+    ax.set_title("Predictors of next fixation location", fontsize=26)
 
     # Coloured category background bands, with rotated labels in the left margin.
     blend = mtransforms.blended_transform_factory(ax.transAxes, ax.transData)
-    x_left = -0.60
+    x_left = -0.72
     x_right = 1.0
-    section_label_x = x_left + 0.035
+    section_label_x = x_left + 0.05
 
     def draw_section_box(y_lo, y_hi, label, color):
         ax.add_patch(Rectangle(
@@ -164,7 +171,7 @@ def main():
             transform=blend, clip_on=False, zorder=0))
         ax.text(section_label_x, (y_lo + y_hi) / 2, label,
                 color="black", va="center", ha="center",
-                fontsize=10, fontweight="bold",
+                fontsize=22, fontweight="bold",
                 transform=blend, clip_on=False, rotation=90)
 
     pad_inner = 0.45
@@ -181,12 +188,15 @@ def main():
 
     section_gap = 1.0 - 2 * pad_inner
     ax.set_ylim(box_bot - section_gap, box_top + section_gap)
-    fig.subplots_adjust(left=0.34, right=0.96)
+    fig.subplots_adjust(left=0.30, right=0.97)
 
-    out_pdf = OUT / "next_fixation_forest.pdf"
-    fig.savefig(OUT / "next_fixation_forest.png", dpi=160, bbox_inches="tight")
-    fig.savefig(out_pdf, bbox_inches="tight")
-    print(f"saved {out_pdf}")
+    out_pdf_local = OUT / "next_fixation_forest.pdf"
+    out_pdf_final = Path(__file__).resolve().parents[2] / "output" / "figures" / "Figure5.pdf"
+    out_pdf_final.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(OUT / "next_fixation_forest.png", dpi=160, bbox_inches="tight", pad_inches=0.1)
+    fig.savefig(out_pdf_local, bbox_inches="tight", pad_inches=0.1)
+    fig.savefig(out_pdf_final, bbox_inches="tight", pad_inches=0.1)
+    print(f"saved {out_pdf_local} and {out_pdf_final}")
 
 
 if __name__ == "__main__":
