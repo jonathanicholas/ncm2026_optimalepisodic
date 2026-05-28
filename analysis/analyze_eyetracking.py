@@ -986,7 +986,7 @@ def add_panel_coef_forest_per_location(ax) -> None:
     ax.set_yticklabels(yticklabels, fontsize=20)
     ax.set_ylim(min(loc_y.values()) - 0.5, max(loc_y.values()) + 0.5)
 
-    ax.set_xlim(-0.5, 0.75)
+    ax.set_xlim(-0.75, 0.75)
     ax.set_xlabel("Effect on Choice (log odds)", fontsize=26)
 
     ax.spines["right"].set_visible(False)
