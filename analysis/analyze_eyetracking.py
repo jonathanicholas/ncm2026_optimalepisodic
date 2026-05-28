@@ -911,137 +911,99 @@ def add_panel_E_coef_by_item(ax) -> None:
     ax.legend(frameon=False, fontsize=12, loc="best")
 
 
-def add_panel_E_coef_by_item_polar(ax, outer_radius: int = 530) -> None:
-    """Panel E: regression coefficients on a circular polar layout.
+_FOREST_PALETTE = {"irr": "#ba7caf", "rel": "#6fc7eb"}
+_FOREST_TERM_FOR = {"irr": "pt_x_val", "rel": "pt_x_val_x_rel"}
 
-    Each wedge matches the heatmap geometry. The radial axis represents
-    coefficient values from -0.5 (center) to 0.75 (outer edge).
+
+def _per_location_coef_rows(coef_df: pd.DataFrame, term: str) -> list:
+    rows = []
+    for loc in range(1, 7):
+        feat = f"loc{loc}_{term}"
+        sub = coef_df[coef_df["feature"].astype(str) == feat]
+        if len(sub) == 0:
+            raise ValueError(f"Coef table missing feature={feat}")
+        r = sub.iloc[0]
+        rows.append({
+            "loc": int(loc),
+            "coef": float(r["coef"]),
+            "lo": float(r["lo"]),
+            "hi": float(r["hi"]),
+        })
+    return rows
+
+
+def add_panel_coef_forest_per_location(ax) -> None:
+    """Horizontal forest plot of per-location logistic-regression coefficients.
+
+    Per-location: 6 rows (loc1 at top, loc6 at bottom), each holding two colored
+    dots side-by-side with horizontal 95% bootstrap CIs:
+      - Irrelevant x Reward (purple #ba7caf): loc{i}_pt_x_val
+      - Relevant x Reward (light blue #6fc7eb): loc{i}_pt_x_val_x_rel
+    Each term's mean across the 6 locations is overlaid as a solid colored
+    vertical line. Y-tick labels are the item angles (0 deg .. 300 deg).
     """
     coef_df = _load_prop_time_coef_table()
-    palette = ["#ba7caf", "#6fc7eb"]
 
-    def _get_loc_term(term: str):
-        rows = []
-        for loc in range(1, 7):
-            feat = f"loc{loc}_{term}"
-            sub = coef_df[coef_df["feature"].astype(str) == feat]
-            if len(sub) == 0:
-                return None
-            r = sub.iloc[0]
-            rows.append({
-                "loc": int(loc),
-                "coef": float(r["coef"]),
-                "lo": float(r["lo"]),
-                "hi": float(r["hi"]),
-            })
-        return pd.DataFrame(rows)
+    loc_y = {loc: float(7 - loc) for loc in range(1, 7)}  # loc1 -> y=6, loc6 -> y=1
+    offset = 0.18
+    y_offset = {"irr": +offset, "rel": -offset}
 
-    reward = _get_loc_term("pt_x_val")
-    reward_x_rel = _get_loc_term("pt_x_val_x_rel")
-    if reward is None or reward_x_rel is None:
-        raise ValueError("Missing reward terms in coef table")
+    per_loc_marker_size = 14 ** 2
+    per_loc_elw = 2.5
 
-    # --- Coordinate helpers ---
-    coef_min, coef_max = -0.5, 0.75
+    per_term_means: dict = {}
 
-    def coef_to_radius(c):
-        return (c - coef_min) / (coef_max - coef_min) * outer_radius
+    for key in ("irr", "rel"):
+        color = _FOREST_PALETTE[key]
+        term = _FOREST_TERM_FOR[key]
+        rows = _per_location_coef_rows(coef_df, term)
+        per_term_means[key] = float(np.mean([r["coef"] for r in rows]))
+        for r in rows:
+            y = loc_y[r["loc"]] + y_offset[key]
+            ax.errorbar(
+                [r["coef"]], [y],
+                xerr=[[r["coef"] - r["lo"]], [r["hi"] - r["coef"]]],
+                fmt="none", ecolor="black", elinewidth=per_loc_elw,
+                capsize=0, zorder=3,
+            )
+            ax.scatter(
+                [r["coef"]], [y],
+                s=per_loc_marker_size, facecolor=color, edgecolor="black",
+                linewidth=2.5, zorder=4,
+            )
 
-    def polar_to_xy(r, angle_deg):
-        rad = np.deg2rad(angle_deg)
-        return r * np.cos(rad), r * np.sin(rad)
+    for key in ("irr", "rel"):
+        ax.axvline(
+            per_term_means[key], color=_FOREST_PALETTE[key], linewidth=3.5,
+            linestyle="-", zorder=2, alpha=0.9,
+        )
 
-    # Item center angles in standard math convention
-    item_angles = {1: 90, 2: 30, 3: -30, 4: -90, 5: -150, 6: 150}
+    ax.axvline(0, color="black", linewidth=2.5, linestyle=":", zorder=1)
 
-    # --- Set up axes ---
-    lim = outer_radius + 5
-    ax.set_aspect("equal", adjustable="box")
-    ax.set_xlim(-lim, lim)
-    ax.set_ylim(-lim, lim)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_title("Regression Coefficients", fontsize=27)
+    yticks = [loc_y[loc] for loc in range(1, 7)]
+    yticklabels = [f"{(loc - 1) * 60}°" for loc in range(1, 7)]
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(yticklabels, fontsize=20)
+    ax.set_ylim(min(loc_y.values()) - 0.5, max(loc_y.values()) + 0.5)
 
-    # --- Concentric gridline circles ---
-    grid_values = [0.0, 0.25, 0.5, 0.75]
-    for tv in grid_values:
-        r = coef_to_radius(tv)
-        if tv == 0.0:
-            style = dict(fill=False, edgecolor="black", linewidth=2.5,
-                         linestyle=":")
-        else:
-            style = dict(fill=False, edgecolor="black", linewidth=2)
-        ax.add_patch(Circle((0, 0), r, **style, zorder=1))
+    ax.set_xlim(-0.5, 0.75)
+    ax.set_xlabel("Effect on Choice (log odds)", fontsize=26)
 
-    # --- Full-diameter sector lines (extend to outer edge = 0.75) ---
-    for i in range(3):
-        angle_deg = i * 60 - 30
-        rad = np.deg2rad(90 - angle_deg)
-        x_end = outer_radius * np.cos(rad)
-        y_end = outer_radius * np.sin(rad)
-        ax.plot([-x_end, x_end], [-y_end, y_end],
-                color="black", linewidth=2, zorder=1)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
 
-    # --- Tick labels on the right horizontal line, at circle intersections ---
-    tick_values = [0.0, 0.5]
-    for tv in tick_values:
-        r = coef_to_radius(tv)
-        ax.text(r, 0, f"{tv:g}", fontsize=24, ha="center", va="center",
-                color="black", zorder=2,
-                bbox=dict(facecolor="white", edgecolor="none", pad=3))
-
-    # --- Plot coefficients as radar/spider chart ---
-    from matplotlib.patches import Polygon
-
-    # Traverse items in angular order around the circle (CCW in math convention)
-    loc_order = [5, 4, 3, 2, 1, 6]  # -150, -90, -30, 30, 90, 150 degrees
-
-    for df_term, color in [
-        (reward, palette[0]),
-        (reward_x_rel, palette[1]),
-    ]:
-        # Gather mean, lo, hi for each location in angular order
-        angles_ordered = []
-        r_means, r_los, r_his = [], [], []
-        for loc in loc_order:
-            row = df_term[df_term["loc"] == loc].iloc[0]
-            angles_ordered.append(item_angles[loc])
-            r_means.append(coef_to_radius(row["coef"]))
-            r_los.append(coef_to_radius(row["lo"]))
-            r_his.append(coef_to_radius(row["hi"]))
-
-        # Convert to xy for the closed polygon
-        mean_xy = [polar_to_xy(r, a) for r, a in zip(r_means, angles_ordered)]
-        lo_xy = [polar_to_xy(r, a) for r, a in zip(r_los, angles_ordered)]
-        hi_xy = [polar_to_xy(r, a) for r, a in zip(r_his, angles_ordered)]
-
-        # CI band: one quad per segment so the band wraps fully
-        for i in range(len(loc_order)):
-            j = (i + 1) % len(loc_order)
-            quad = np.array([hi_xy[i], hi_xy[j], lo_xy[j], lo_xy[i]])
-            ax.add_patch(Polygon(quad, closed=True, facecolor=color,
-                                 alpha=0.45, edgecolor="none", zorder=2))
-
-        # Dots at means
-        for mx, my in mean_xy:
-            ax.scatter(mx, my, s=14**2, facecolor=color,
-                       edgecolor="black", linewidth=2.5, zorder=4)
-
-    # --- Legend ---
     legend_handles = [
-        Line2D([0], [0], marker="o", color="w", markerfacecolor=palette[0],
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=_FOREST_PALETTE["irr"],
                markeredgecolor="black", markeredgewidth=2.5, markersize=14,
                label="Irrelevant x Reward"),
-        Line2D([0], [0], marker="o", color="w", markerfacecolor=palette[1],
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=_FOREST_PALETTE["rel"],
                markeredgecolor="black", markeredgewidth=2.5, markersize=14,
                label="Relevant x Reward"),
     ]
-    ax.legend(handles=legend_handles, frameon=True, fontsize=20,
-              loc="upper center", handletextpad=0.1, ncol=1,
-              bbox_to_anchor=(0.5, 0),
+    ax.legend(handles=legend_handles, frameon=True, fontsize=16,
+              loc="upper center", handletextpad=0.2, ncol=2,
+              columnspacing=1.0, borderaxespad=0.2,
+              bbox_to_anchor=(0.5, -0.32),
               facecolor="white", edgecolor="none")
 
 
@@ -1057,8 +1019,8 @@ def create_eyeplot_layout(
 
     Row 2 (bottom):
         - Col 1 (C): relsign4 relevant subject means
-        - Col 2 (D): choice prediction accuracy
-        - Col 3 (E): reward and interaction coefficients by item (polar)
+        - Col 2 (E): choice prediction accuracy (CV bar)
+        - Col 3 (D): reward and interaction coefficients by item (forest)
 
     Styling is matched to the summary_panel figure in analyze_behavior.py
     (seaborn "poster" context, Arial fonts, similar font sizes).
@@ -1089,9 +1051,14 @@ def create_eyeplot_layout(
         # Row 2: C (separated) + [E, D] block (tight)
         row2 = outer[1].subgridspec(1, 2, width_ratios=[1, 1.35], wspace=0.4) #0.5
         ax_C = fig.add_subplot(row2[0, 0])    # C: relsign4 relevant
-        row2_right = row2[0, 1].subgridspec(1, 2, width_ratios=[0.35, 1], wspace=0.1)
+        row2_right = row2[0, 1].subgridspec(1, 2, width_ratios=[0.35, 1], wspace=0.5)
         ax_E = fig.add_subplot(row2_right[0, 0])    # E: CV accuracy
-        ax_D = fig.add_subplot(row2_right[0, 1])    # D: regression coefficients polar
+        # Reserve a strip at the bottom of the coef cell for its legend so the
+        # legend doesn't dangle below the other panels in this row.
+        coef_cell = row2_right[0, 1].subgridspec(
+            2, 1, height_ratios=[1, 0.32], hspace=0.0,
+        )
+        ax_D = fig.add_subplot(coef_cell[0, 0])    # D: regression coefficients forest
 
         # Panel A: recall time course
         try:
@@ -1120,9 +1087,9 @@ def create_eyeplot_layout(
         except Exception as e:
             print(f"Warning: failed to populate panel C (relsign4 relevant): {e}")
 
-        # Panel D: regression coefficients by item (polar plot), under heatmap
+        # Panel D: regression coefficients by item (horizontal forest plot)
         try:
-            add_panel_E_coef_by_item_polar(ax_D)
+            add_panel_coef_forest_per_location(ax_D)
         except Exception as e:
             print(f"Warning: failed to populate panel D (coef by item): {e}")
 

@@ -22,7 +22,6 @@ from typing import Optional, Tuple
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from matplotlib.patches import Circle, Polygon
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -612,6 +611,183 @@ def _load_human_benchmarks(human_data_dir: str, *, recalled_valence: bool = Fals
     return result
 
 
+# ---------------------------------------------------------------------------
+# Forest coefficient panel (Panel H)
+# ---------------------------------------------------------------------------
+
+_FOREST_PALETTE = {"irr": "#ba7caf", "rel": "#6fc7eb"}
+_FOREST_TERM_FOR = {"irr": "pt_x_val", "rel": "pt_x_val_x_rel"}
+
+
+def _filter_coef_df(df: pd.DataFrame, *, value_source: Optional[str] = None) -> pd.DataFrame:
+    df = df.copy()
+    if value_source is not None and "value_source" in df.columns:
+        df = df[df["value_source"].astype(str) == value_source]
+    if "feature_set" in df.columns:
+        df = df[df["feature_set"].astype(str) == "location_interactions"]
+    if "visit_type" in df.columns:
+        df = df[df["visit_type"].astype(str) == "all"]
+    return df
+
+
+def _pick_value_source(df: pd.DataFrame) -> Optional[str]:
+    if "value_source" not in df.columns:
+        return None
+    vs = df["value_source"].astype(str)
+    if (vs == "recalled").any():
+        return "recalled"
+    if (vs == "true").any():
+        return "true"
+    return None
+
+
+def _per_location_rows(coef_df: pd.DataFrame, term: str) -> list:
+    rows = []
+    for loc in range(1, 7):
+        feat = f"loc{loc}_{term}"
+        sub = coef_df[coef_df["feature"].astype(str) == feat]
+        if len(sub) == 0:
+            return []
+        r = sub.iloc[0]
+        rows.append({
+            "loc": int(loc),
+            "coef": float(r["coef"]),
+            "lo": float(r["lo"]),
+            "hi": float(r["hi"]),
+        })
+    return rows
+
+
+def _load_human_coef_table(human_data_dir: str) -> Optional[pd.DataFrame]:
+    base = os.path.join(human_data_dir, "eyegaze", "stats")
+    candidates = glob.glob(os.path.join(base, "coef_table_prop_time_*.csv"))
+    if not candidates:
+        return None
+    path = _pick_latest(candidates)
+    if path is None:
+        return None
+    df = pd.read_csv(path)
+    return _filter_coef_df(df, value_source=_pick_value_source(df))
+
+
+def _load_drop_fix_coef_table(drop_fix_dir: str) -> Optional[pd.DataFrame]:
+    candidates = glob.glob(os.path.join(drop_fix_dir, "coef_table_prop_time_*.csv"))
+    if not candidates:
+        return None
+    path = _pick_latest(candidates)
+    if path is None:
+        return None
+    df = pd.read_csv(path)
+    return _filter_coef_df(df, value_source=_pick_value_source(df))
+
+
+def add_panel_H_coef_forest_nn(
+    ax,
+    nn_coef_df: pd.DataFrame,
+    *,
+    drop_fix_coef_df: Optional[pd.DataFrame] = None,
+    human_coef_df: Optional[pd.DataFrame] = None,
+    spine_linewidth: float = 2.0,
+    legend_anchor: tuple = (0.5, -0.325),
+) -> None:
+    """Forest plot replacement for the NN polar coefficient panel.
+
+    Layers (back to front):
+      - Translucent human CI bands per term (purple Irr x Reward, blue Rel x Reward),
+        extending ~0.15 row-units past the top/bottom dots so they don't visually
+        cut off at the endpoints.
+      - NN per-location dots (no error bars) on each row.
+      - Drop-fix X markers overlaid on the same rows (same colors).
+    Plus a dotted reference line at x=0 and a 2-column legend below the axes.
+    """
+
+    loc_y = {loc: float(7 - loc) for loc in range(1, 7)}  # loc1 -> y=6, loc6 -> y=1
+    y_offset = {"irr": 0.0, "rel": 0.0}
+
+    per_loc_size = 14 ** 2
+    cross_size = 14 ** 2
+
+    # --- Human CI bands (drawn first so they sit behind NN dots) ---
+    if human_coef_df is not None and len(human_coef_df) > 0:
+        band_extend = 0.15  # extend each band just to the edge of the end dots
+        for key in ("irr", "rel"):
+            rows = _per_location_rows(human_coef_df, _FOREST_TERM_FOR[key])
+            if not rows:
+                continue
+            ys = np.array([loc_y[r["loc"]] + y_offset[key] for r in rows])
+            xlo = np.array([r["lo"] for r in rows])
+            xhi = np.array([r["hi"] for r in rows])
+            order = np.argsort(ys)
+            ys_s, xlo_s, xhi_s = ys[order], xlo[order], xhi[order]
+            ys_ext = np.concatenate(([ys_s[0] - band_extend], ys_s, [ys_s[-1] + band_extend]))
+            xlo_ext = np.concatenate(([xlo_s[0]], xlo_s, [xlo_s[-1]]))
+            xhi_ext = np.concatenate(([xhi_s[0]], xhi_s, [xhi_s[-1]]))
+            ax.fill_betweenx(
+                ys_ext, xlo_ext, xhi_ext,
+                facecolor=_FOREST_PALETTE[key], alpha=0.45, edgecolor="none", zorder=2,
+            )
+
+    # --- NN per-location dots (no error bars) ---
+    for key in ("irr", "rel"):
+        color = _FOREST_PALETTE[key]
+        rows = _per_location_rows(nn_coef_df, _FOREST_TERM_FOR[key])
+        for r in rows:
+            y = loc_y[r["loc"]] + y_offset[key]
+            ax.scatter(
+                [r["coef"]], [y],
+                s=per_loc_size, facecolor=color, edgecolor="black",
+                linewidth=2.5, zorder=4,
+            )
+
+    # --- Drop-fix X markers (the "crosses") on same rows ---
+    if drop_fix_coef_df is not None and len(drop_fix_coef_df) > 0:
+        for key in ("irr", "rel"):
+            color = _FOREST_PALETTE[key]
+            rows = _per_location_rows(drop_fix_coef_df, _FOREST_TERM_FOR[key])
+            for r in rows:
+                y = loc_y[r["loc"]] + y_offset[key]
+                ax.scatter(
+                    [r["coef"]], [y],
+                    s=cross_size, marker="X", facecolor=color,
+                    edgecolor="black", linewidth=2.5, zorder=5,
+                )
+
+    # --- Reference line at 0 ---
+    ax.axvline(0, color="black", linewidth=2.5, linestyle=":", zorder=1)
+
+    # Make the left/bottom spines visible and match the other panels' weight.
+    for side in ("left", "bottom"):
+        ax.spines[side].set_visible(True)
+        ax.spines[side].set_linewidth(spine_linewidth)
+        ax.spines[side].set_color("black")
+
+    yticks = [loc_y[loc] for loc in range(1, 7)]
+    yticklabels = [f"{(loc - 1) * 60}°" for loc in range(1, 7)]
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(yticklabels, fontsize=20)
+    ax.set_ylim(min(loc_y.values()) - 0.5, max(loc_y.values()) + 0.5)
+
+    ax.set_xlim(-0.5, 0.75)
+    ax.set_xlabel("Effect on Choice (log odds)", fontsize=26)
+
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+
+    legend_handles = [
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=_FOREST_PALETTE["irr"],
+               markeredgecolor="black", markeredgewidth=2.5, markersize=14,
+               label="Irrelevant x Reward"),
+        Line2D([0], [0], marker="o", color="w", markerfacecolor=_FOREST_PALETTE["rel"],
+               markeredgecolor="black", markeredgewidth=2.5, markersize=14,
+               label="Relevant x Reward"),
+    ]
+    ax.legend(handles=legend_handles, frameon=True, fontsize=16,
+              loc="upper center", handletextpad=0.2, ncol=2,
+              columnspacing=1.0, borderaxespad=0.2,
+              bbox_to_anchor=legend_anchor,
+              facecolor="white", edgecolor="none")
+
+
 def create_nn_overview_figure(
     *,
     root: str,
@@ -710,11 +886,14 @@ def create_nn_overview_figure(
         # Row 2: nested gridspec so panel C matches Figure2 row 2 panel 1 width
         gs_bot = gs[1].subgridspec(1, 2, width_ratios=[0.94, 1.0], wspace=0.37)
         gs_bot_left = gs_bot[0, 0].subgridspec(1, 2, width_ratios=[1.35, 1.0], wspace=0.8)
-        gs_bot_right = gs_bot[0, 1].subgridspec(1, 2, width_ratios=[0.35, 1.0], wspace=0.0)
+        # axH cell carries a sub-gridspec so the forest panel's legend has a
+        # reserved strip below it (matches Figure 2's coef_cell layout).
+        gs_bot_right = gs_bot[0, 1].subgridspec(1, 2, width_ratios=[0.30, 0.85], wspace=0.5)
         axC = fig.add_subplot(gs_bot_left[0, 0])
         axD = fig.add_subplot(gs_bot_left[0, 1])
         axG = fig.add_subplot(gs_bot_right[0, 0])
-        axH = fig.add_subplot(gs_bot_right[0, 1])
+        h_cell = gs_bot_right[0, 1].subgridspec(2, 1, height_ratios=[1, 0.32], hspace=0.0)
+        axH = fig.add_subplot(h_cell[0, 0])
 
         # Panel A: NN choice accuracy (Figure2_NN A)
         subj_acc = df_all.groupby("subject")["correct"].mean()
@@ -922,127 +1101,40 @@ def create_nn_overview_figure(
                 axG.spines["right"].set_visible(False)
                 axG.spines["top"].set_visible(False)
 
-        # Panel H: polar/radar plot of regression coefficients, matching Figure3 Panel E
-        _outer_radius = 530
+        # Panel H: regression coefficients as a horizontal forest plot.
+        # NN dots + drop-fix X markers + translucent human CI bands.
         if pred_coef_table_csv is None:
             axH.axis("off")
             axH.text(0.5, 0.5, "Missing coef_table_prop_time_*.csv", ha="center", va="center", transform=axH.transAxes)
         else:
-            coef_df = pd.read_csv(pred_coef_table_csv)
-            coef_df = coef_df.copy()
-            if chosen_vs is not None and "value_source" in coef_df.columns:
-                coef_df = coef_df[coef_df["value_source"].astype(str) == chosen_vs]
-            if "feature_set" in coef_df.columns:
-                coef_df = coef_df[coef_df["feature_set"].astype(str) == "location_interactions"]
-            if "visit_type" in coef_df.columns:
-                coef_df = coef_df[coef_df["visit_type"].astype(str) == "all"]
+            nn_coef_df = _filter_coef_df(pd.read_csv(pred_coef_table_csv), value_source=chosen_vs)
 
-            def _get_loc_term(term: str) -> Optional[pd.DataFrame]:
-                rows = []
-                for loc in range(1, 7):
-                    feat = f"loc{loc}_{term}"
-                    sub = coef_df[coef_df["feature"].astype(str) == feat]
-                    if len(sub) == 0:
-                        return None
-                    r = sub.iloc[0]
-                    rows.append({
-                        "loc": int(loc),
-                        "coef": float(r["coef"]),
-                        "lo": float(r["lo"]),
-                        "hi": float(r["hi"]),
-                    })
-                return pd.DataFrame(rows)
+            drop_fix_df = (
+                _load_drop_fix_coef_table(os.path.abspath(drop_fix_pred_dir))
+                if drop_fix_pred_dir is not None else None
+            )
+            human_df = (
+                _load_human_coef_table(human_data_dir)
+                if human_data_dir is not None else None
+            )
 
-            reward = _get_loc_term("pt_x_val")
-            reward_x_rel = _get_loc_term("pt_x_val_x_rel")
+            ref_lw = axA.spines["left"].get_linewidth()
 
-            if reward is None or reward_x_rel is None:
-                axH.axis("off")
-                axH.text(0.5, 0.5, "Missing reward terms in coef table", ha="center", va="center", transform=axH.transAxes)
-            else:
-                palette = ["#ba7caf", "#6fc7eb"]
-                nn_palette = palette
-
-                # --- Polar coordinate helpers ---
-                _coef_min, _coef_max = -0.5, 0.75
-
-                def _coef_to_radius(c):
-                    return (c - _coef_min) / (_coef_max - _coef_min) * _outer_radius
-
-                def _polar_to_xy(r, angle_deg):
-                    rad = np.deg2rad(angle_deg)
-                    return r * np.cos(rad), r * np.sin(rad)
-
-                item_angles = {1: 90, 2: 30, 3: -30, 4: -90, 5: -150, 6: 150}
-                loc_order = [5, 4, 3, 2, 1, 6]  # CCW angular order
-
-                # --- Set up axes ---
-                _lim = _outer_radius + 5
-                axH.set_aspect("equal", adjustable="box")
-                axH.set_xlim(-_lim, _lim)
-                axH.set_ylim(-_lim, _lim)
-                for spine in axH.spines.values():
-                    spine.set_visible(False)
-                axH.set_xticks([])
-                axH.set_yticks([])
-                axH.set_title("Regression Coefficients", fontsize=27)
-
-                # --- Concentric gridline circles ---
-                for tv in [0.0, 0.25, 0.5, 0.75]:
-                    r = _coef_to_radius(tv)
-                    if tv == 0.0:
-                        style = dict(fill=False, edgecolor="black", linewidth=2.5, linestyle=":")
-                    else:
-                        style = dict(fill=False, edgecolor="black", linewidth=2)
-                    axH.add_patch(Circle((0, 0), r, **style, zorder=1))
-
-                # --- Full-diameter sector lines ---
-                for i in range(3):
-                    angle_deg = i * 60 - 30
-                    rad = np.deg2rad(90 - angle_deg)
-                    x_end = _outer_radius * np.cos(rad)
-                    y_end = _outer_radius * np.sin(rad)
-                    axH.plot([-x_end, x_end], [-y_end, y_end],
-                             color="black", linewidth=2, zorder=1)
-
-                # --- Tick labels ---
-                for tv in [0.0, 0.5]:
-                    r = _coef_to_radius(tv)
-                    axH.text(r, 0, f"{tv:g}", fontsize=24, ha="center", va="center",
-                             color="black", zorder=2,
-                             bbox=dict(facecolor="white", edgecolor="none", pad=3))
-
-                # --- Plot NN coefficients as dots only (no connecting lines) ---
-                for df_term, color in [(reward, nn_palette[0]), (reward_x_rel, nn_palette[1])]:
-                    for _, row in df_term.iterrows():
-                        loc = int(row["loc"])
-                        r = _coef_to_radius(row["coef"])
-                        mx, my = _polar_to_xy(r, item_angles[loc])
-                        axH.scatter(mx, my, s=14**2, facecolor=color,
-                                    edgecolor="black", linewidth=2.5, zorder=4)
-
-                # --- Legend ---
-                legend_handles = [
-                    Line2D([0], [0], marker="o", color="w", markerfacecolor=nn_palette[0],
-                           markeredgecolor="black", markeredgewidth=2.5, markersize=14,
-                           label="Irrelevant x Reward"),
-                    Line2D([0], [0], marker="o", color="w", markerfacecolor=nn_palette[1],
-                           markeredgecolor="black", markeredgewidth=2.5, markersize=14,
-                           label="Relevant x Reward"),
-                ]
-                axH.legend(handles=legend_handles, frameon=True, fontsize=20,
-                           loc="upper center", handletextpad=0.1, ncol=1,
-                           bbox_to_anchor=(0.5, 0),
-                           facecolor="white", edgecolor="none")
+            add_panel_H_coef_forest_nn(
+                axH,
+                nn_coef_df=nn_coef_df,
+                drop_fix_coef_df=drop_fix_df,
+                human_coef_df=human_df,
+                spine_linewidth=ref_lw,
+            )
 
         # --- Drop-fixation overlay on Panels G and H ---
         if drop_fix_pred_dir is not None:
             drop_fix_pred_dir = os.path.abspath(drop_fix_pred_dir)
-            # Find summary and coef table in the drop-fix directory.
+            # Find the summary CSV for the Panel G overlay. The Panel H drop-fix
+            # coef table is loaded separately inside add_panel_H_coef_forest_nn.
             drop_summ_candidates = glob.glob(os.path.join(drop_fix_pred_dir, "summary_prop_time_*.csv"))
-            drop_coef_candidates = glob.glob(os.path.join(drop_fix_pred_dir, "coef_table_prop_time_*.csv"))
             drop_summ_csv = _pick_latest(drop_summ_candidates)
-            drop_coef_csv = _pick_latest(drop_coef_candidates)
 
             # Panel G overlay: CV accuracy as X marker.
             if drop_summ_csv is not None:
@@ -1065,49 +1157,7 @@ def create_nn_overview_figure(
             else:
                 print(f"[drop-fix overlay] No summary CSV found in {drop_fix_pred_dir}")
 
-            # Panel H overlay: coefficients as X markers (polar coordinates).
-            if drop_coef_csv is not None:
-                dc = pd.read_csv(drop_coef_csv)
-                if "feature_set" in dc.columns:
-                    dc = dc[dc["feature_set"].astype(str) == "location_interactions"]
-                if "visit_type" in dc.columns:
-                    dc = dc[dc["visit_type"].astype(str) == "all"]
-
-                def _get_loc_term_drop(term: str) -> Optional[pd.DataFrame]:
-                    rows = []
-                    for loc in range(1, 7):
-                        feat = f"loc{loc}_{term}"
-                        sub = dc[dc["feature"].astype(str) == feat]
-                        if len(sub) == 0:
-                            return None
-                        r = sub.iloc[0]
-                        rows.append({"loc": int(loc), "coef": float(r["coef"]), "lo": float(r["lo"]), "hi": float(r["hi"])})
-                    return pd.DataFrame(rows)
-
-                _item_angles_drop = {1: 90, 2: 30, 3: -30, 4: -90, 5: -150, 6: 150}
-                _coef_min_d, _coef_max_d = -0.5, 0.75
-
-                def _coef_to_r_drop(c):
-                    return (c - _coef_min_d) / (_coef_max_d - _coef_min_d) * _outer_radius
-
-                def _p2xy_drop(r, a):
-                    return r * np.cos(np.deg2rad(a)), r * np.sin(np.deg2rad(a))
-
-                palette = ["#ba7caf", "#6fc7eb"]
-                for term, color in [("pt_x_val", palette[0]), ("pt_x_val_x_rel", palette[1])]:
-                    dt = _get_loc_term_drop(term)
-                    if dt is not None:
-                        for _, rr in dt.iterrows():
-                            loc = int(rr["loc"])
-                            r = _coef_to_r_drop(rr["coef"])
-                            mx, my = _p2xy_drop(r, _item_angles_drop[loc])
-                            axH.scatter(
-                                mx, my, s=14**2, marker="X",
-                                facecolor=color, edgecolor="black", linewidth=2.5,
-                                zorder=5,
-                            )
-            else:
-                print(f"[drop-fix overlay] No coef table CSV found in {drop_fix_pred_dir}")
+            # Panel H drop-fix overlay is handled inside add_panel_H_coef_forest_nn.
 
         # --- Human group-level overlays ---
         if human_data_dir is not None:
@@ -1137,46 +1187,7 @@ def create_nn_overview_figure(
                 m, se = hb["cv_mean"], hb["cv_sem"]
                 _add_human_hline_ci(axG, m, m - 1.96 * se, m + 1.96 * se, zorder=0)
 
-            # Panel H: human regression coefficients as radar lines + CI bands
-            if "coef_table" in hb:
-                hcoef = hb["coef_table"]
-                palette = ["#ba7caf", "#6fc7eb"]
-                _item_angles_h = {1: 90, 2: 30, 3: -30, 4: -90, 5: -150, 6: 150}
-                _loc_order_h = [5, 4, 3, 2, 1, 6]
-                _coef_min_h, _coef_max_h = -0.5, 0.75
-
-                def _coef_to_r_h(c):
-                    return (c - _coef_min_h) / (_coef_max_h - _coef_min_h) * _outer_radius
-
-                def _p2xy_h(r, a):
-                    return r * np.cos(np.deg2rad(a)), r * np.sin(np.deg2rad(a))
-
-                for term, color in [("pt_x_val", palette[0]), ("pt_x_val_x_rel", palette[1])]:
-                    h_coefs, h_los, h_his = {}, {}, {}
-                    for loc in range(1, 7):
-                        feat = f"loc{loc}_{term}"
-                        sub = hcoef[hcoef["feature"].astype(str) == feat]
-                        if len(sub) > 0:
-                            h_coefs[loc] = float(sub.iloc[0]["coef"])
-                            h_los[loc] = float(sub.iloc[0]["lo"])
-                            h_his[loc] = float(sub.iloc[0]["hi"])
-                    if len(h_coefs) == 6:
-                        # Gather in angular order
-                        angles_ord = [_item_angles_h[loc] for loc in _loc_order_h]
-                        r_means = [_coef_to_r_h(h_coefs[loc]) for loc in _loc_order_h]
-                        r_los = [_coef_to_r_h(h_los[loc]) for loc in _loc_order_h]
-                        r_his = [_coef_to_r_h(h_his[loc]) for loc in _loc_order_h]
-
-                        mean_xy = [_p2xy_h(r, a) for r, a in zip(r_means, angles_ord)]
-                        lo_xy = [_p2xy_h(r, a) for r, a in zip(r_los, angles_ord)]
-                        hi_xy = [_p2xy_h(r, a) for r, a in zip(r_his, angles_ord)]
-
-                        # CI band as quads
-                        for i in range(len(_loc_order_h)):
-                            j = (i + 1) % len(_loc_order_h)
-                            quad = np.array([hi_xy[i], hi_xy[j], lo_xy[j], lo_xy[i]])
-                            axH.add_patch(Polygon(quad, closed=True, facecolor=color,
-                                                  alpha=0.45, edgecolor="none", zorder=2))
+            # Panel H human overlay is handled inside add_panel_H_coef_forest_nn.
 
             # Panel F: take/leave proportion band (behind NN data)
             if "take_leave_stats" in hb:
