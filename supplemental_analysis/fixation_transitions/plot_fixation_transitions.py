@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Fixation-transition structure: humans vs. prior-memory network (Figure S6).
 
-A 2 row x 2 column figure (Row 1 = Human, Row 2 = Network):
-  Column 1: Bidirectional template + observed transition heatmaps (left),
-            bidirectional delta-similarity scatter (right).
-  Column 2: Delta fraction of transitions by run length (all fixations).
+A 1 row x 2 column figure showing chance-corrected proportion of transitions
+by sequence (run) length:
+  Column 1 (Humans):  Delta fraction of transitions by run length.
+  Column 2 (Network): Delta fraction of transitions by run length.
+
+(The transition-matrix heatmaps and delta-similarity bars previously shown
+here have moved to the main Figure 5.)
 
 Sweep transition data is cached to disk so that subsequent runs skip the
 expensive shuffle computation.
@@ -279,6 +282,10 @@ def _plot_single_heatmap(
     if cbar_kws is None:
         cbar_kws = {"shrink": 0.8} if (cbar and cbar_ax is None) else None
 
+    # Position labels: only the two endpoints (0° at position 1, 300° at
+    # position 6); intermediate positions (2-5) are left blank. The angular
+    # labels emphasise that the six positions sit on a 60°-spaced ring.
+    pos_labels = ["0°", "", "", "", "", "300°"]
     sns.heatmap(
         mat,
         ax=ax,
@@ -293,8 +300,8 @@ def _plot_single_heatmap(
         mask=mask,
         linewidths=1.5 if cell_lines else 0,
         linecolor="black" if cell_lines else "none",
-        xticklabels=[str(j) for j in range(1, n_items + 1)],
-        yticklabels=[str(j) for j in range(1, n_items + 1)],
+        xticklabels=pos_labels,
+        yticklabels=pos_labels,
     )
     if mask_diagonal:
         for i in range(mat.shape[0]):
@@ -318,9 +325,18 @@ def _plot_single_heatmap(
             spine.set_linewidth(1.5)
     if title:
         ax.set_title(title, fontsize=22)
-    ax.set_xlabel("Next pos." if show_xlabel else "", fontsize=14)
-    ax.set_ylabel("Current pos." if show_ylabel else "", fontsize=14)
+    ax.set_xlabel("Next pos." if show_xlabel else "", fontsize=18)
+    ax.set_ylabel("Current pos." if show_ylabel else "", fontsize=18)
     ax.tick_params(length=0)
+    # Explicit per-label styling — sns.heatmap can apply its own tick-label
+    # sizes/rotations, so we override after the heatmap has been drawn:
+    # match the axis-label fontsize, and keep the y-axis degree labels
+    # upright rather than rotated 90 degrees.
+    for label in ax.get_xticklabels():
+        label.set_fontsize(18)
+    for label in ax.get_yticklabels():
+        label.set_fontsize(18)
+        label.set_rotation(0)
 
 
 def _plot_single_delta_similarity(
@@ -347,15 +363,16 @@ def _plot_single_delta_similarity(
            color=_gray, edgecolor="none", linewidth=0, zorder=2)
     # Black outline bar (on top of dots)
     ax.bar(0, m, width=_bar_w,
-           color="none", edgecolor="black", linewidth=1.5, zorder=4)
+           color="none", edgecolor="black", linewidth=3.0, zorder=4)
 
-    # Individual subject dots
+    # Individual subject dots — sized to match the per-subject dots in the
+    # forest plot (s=90) so the two panels feel visually consistent.
     if len(y) > 0:
         jitter = rng.uniform(-0.08, 0.08, size=len(y))
         for i in range(len(y)):
             ax.scatter(
                 jitter[i], y[i],
-                s=6 ** 2,
+                s=90,
                 facecolor=(1, 1, 1, 0.5),
                 edgecolor=_gray,
                 linewidth=1,
@@ -366,7 +383,7 @@ def _plot_single_delta_similarity(
     ax.errorbar(
         0, m, yerr=sem_val,
         fmt="none", ecolor="black",
-        linewidth=1.5, capsize=0, zorder=5,
+        linewidth=3.0, capsize=0, zorder=5,
     )
 
     ax.set_xticks([])
@@ -473,13 +490,7 @@ def create_figure(
     )
 
     # ------------------------------------------------------------------
-    # Step 2: Get bidirectional template
-    # ------------------------------------------------------------------
-    templates = sweep_template_matrices(n_items=6)
-    bi_template = templates["bidirectional"]
-
-    # ------------------------------------------------------------------
-    # Step 3: Save per-subject CSVs for statistical testing
+    # Step 2: Save per-subject CSVs for statistical testing
     # ------------------------------------------------------------------
     _save_stats_csvs(
         human_sweep=human_sweep,
@@ -489,7 +500,7 @@ def create_figure(
     )
 
     # ------------------------------------------------------------------
-    # Build figure
+    # Build figure: 1 row x 2 columns of run-length delta bars only.
     # ------------------------------------------------------------------
     print("Building figure ...", flush=True)
 
@@ -505,159 +516,43 @@ def create_figure(
         "ytick.labelsize": 16,
         "hatch.linewidth": 1.5,
     }):
-        fig = plt.figure(figsize=(15.5, 12))
-        # Outer grid: one cell per row, each holding [heatmaps+delta-similarity
-        # | run-length].
-        gs_outer = fig.add_gridspec(2, 1, hspace=0.45)
+        fig = plt.figure(figsize=(11, 5))
+        gs = fig.add_gridspec(1, 2, wspace=0.4)
 
-        # Heatmap color scale: per-row sequential range [vmin, vmax] fitted
-        # to the *off-diagonal* observed cells. The diagonal is always 0 by
-        # construction (sequences are pre-collapsed), so including it in the
-        # scale compresses the color gradient onto the top of the colormap
-        # and washes out the off-diagonal pattern. By setting vmin to the
-        # off-diagonal minimum instead of 0, the full colormap range is
-        # used for the actual data variation. The diagonal cells clip to
-        # the darkest color, and the template's 0.5 neighbor cells clip to
-        # the brightest — both clear visually.
-        def _obs_offdiag_range(sweep_data: Dict[str, Any]) -> Tuple[float, float]:
-            m = sweep_data["obs_trans_by_panel"][PANEL_ALL]
-            if m.size == 0:
-                return 0.0, 1.0
-            off_diag_mask = ~np.eye(m.shape[0], dtype=bool) & np.isfinite(m)
-            vals = m[off_diag_mask]
-            if vals.size == 0:
-                return 0.0, 1.0
-            lo = max(0.0, float(vals.min()))
-            hi = max(lo + 1e-6, float(vals.max()))
-            return lo, hi
-
-        hm_vmin_human, hm_vmax_human = _obs_offdiag_range(human_sweep)
-        hm_vmin_nn, hm_vmax_nn = _obs_offdiag_range(nn_sweep)
-        hm_cmap = "viridis"
-
-        row_configs = [
+        col_configs = [
             {
                 "label": "Humans",
                 "sweep": human_sweep,
-                "hm_vmin": hm_vmin_human,
-                "hm_vmax": hm_vmax_human,
-                "hm_cmap": hm_cmap,
-                "ds_ylim": (0, 0.6),
-                "ds_yticks": [0, 0.2, 0.4, 0.6],
                 "rl_ylim": (0, 0.06),
                 "rl_yticks": [0, 0.03, 0.06],
             },
             {
                 "label": "Network",
                 "sweep": nn_sweep,
-                "hm_vmin": hm_vmin_nn,
-                "hm_vmax": hm_vmax_nn,
-                "hm_cmap": hm_cmap,
-                "ds_ylim": (0, 0.3),
-                "ds_yticks": [0, 0.1, 0.2, 0.3],
                 "rl_ylim": (0, 0.02),
                 "rl_yticks": [0, 0.01, 0.02],
             },
         ]
 
-        for r, cfg in enumerate(row_configs):
+        for c, cfg in enumerate(col_configs):
             sweep = cfg["sweep"]
-
-            # Row layout: [heatmaps+delta-similarity | run-length].
-            gs_right = gs_outer[r, 0].subgridspec(
-                1, 2,
-                wspace=0.45,
-                width_ratios=[2.25, 1.2],
-            )
-
-            # --- Column 1: Compound panel (heatmaps + delta similarity) ---
-            gs_col2 = gs_right[0, 0].subgridspec(
-                2, 2,
-                wspace=0.05,
-                hspace=0.55,
-                width_ratios=[1, 0.3],
-            )
-            ax_template = fig.add_subplot(gs_col2[0, 0])
-            ax_obs_trans = fig.add_subplot(gs_col2[1, 0])
-            ax_delta_sim = fig.add_subplot(gs_col2[:, 1])
-
-            # Template heatmap (top-left) — viridis binary reference.
-            # Diagonal cells are rendered solid black to mark that
-            # self-transitions are excluded by construction.
-            divider_tmpl = make_axes_locatable(ax_template)
-            ax_cbar_tmpl = divider_tmpl.append_axes("right", size="5%", pad=0.08)
-            _plot_single_heatmap(
-                ax_template, bi_template,
-                cmap="viridis",
-                title="Template",
-                vmin=0.0, vmax=0.5,
-                show_xlabel=False, show_ylabel=False,
-                mask_diagonal=True,
-                cbar=True,
-                cbar_ax=ax_cbar_tmpl,
-            )
-            ax_cbar_tmpl.set_yticks([0.0, 0.25, 0.5])
-            ax_cbar_tmpl.set_yticklabels(["0.00", "0.25", "0.50"])
-            ax_cbar_tmpl.tick_params(labelsize=14)
-
-            # Observed transition heatmap (bottom-left): row-normalized
-            # conditional transition probabilities. The diagonal is always
-            # zero by construction (sequences are pre-collapsed) and is
-            # masked out (rendered white) so the color scale can fit the
-            # off-diagonal variation without being pulled toward zero.
-            # A colorbar is attached to the right of the observed axes.
-            obs_mat = sweep["obs_trans_by_panel"][PANEL_ALL]
-            divider = make_axes_locatable(ax_obs_trans)
-            ax_cbar = divider.append_axes("right", size="5%", pad=0.08)
-            _plot_single_heatmap(
-                ax_obs_trans, obs_mat,
-                cmap=cfg["hm_cmap"],
-                title="Observed",
-                vmin=cfg["hm_vmin"], vmax=cfg["hm_vmax"],
-                mask_diagonal=True,
-                cbar=True,
-                cbar_ax=ax_cbar,
-            )
-            # Colorbar ticks at min / middle / max, two decimal places.
-            cb_vmin = cfg["hm_vmin"]
-            cb_vmax = cfg["hm_vmax"]
-            cb_mid = (cb_vmin + cb_vmax) / 2
-            ax_cbar.set_yticks([cb_vmin, cb_mid, cb_vmax])
-            ax_cbar.set_yticklabels([
-                f"{cb_vmin:.2f}", f"{cb_mid:.2f}", f"{cb_vmax:.2f}",
-            ])
-            ax_cbar.tick_params(labelsize=14)
-
-            # Bidirectional delta-similarity (right, full height)
-            delta_bi = sweep["delta_similarity"][PANEL_ALL]["bidirectional"]
-            _plot_single_delta_similarity(
-                ax_delta_sim, delta_bi,
-                ylim=cfg["ds_ylim"], yticks=cfg["ds_yticks"],
-            )
-
-            # --- Column 2: Run-Length Delta Bars ---
-            ax_col3 = fig.add_subplot(gs_right[0, 1])
+            ax = fig.add_subplot(gs[0, c])
             _plot_single_runlength_delta(
-                ax_col3,
+                ax,
                 sweep["transprop_obs"][PANEL_ALL],
                 sweep["transprop_null"][PANEL_ALL],
                 sweep["run_bin_labels"],
                 ylim=cfg["rl_ylim"], yticks=cfg["rl_yticks"],
             )
+            cfg["_ax"] = ax
 
-            # Store axes for row title placement after layout
-            cfg["_ax_left"] = ax_template
-            cfg["_ax_right"] = ax_col3
-
-        # Force layout so get_position() returns final coords
+        # Force layout so get_position() returns final coords for title placement.
         fig.canvas.draw()
 
-        for cfg in row_configs:
-            pos_left = cfg["_ax_left"].get_position()
-            pos_right = cfg["_ax_right"].get_position()
-            # Center over the full row extent including labels
-            x_center = (pos_left.x0 + pos_right.x1) / 2
-            y_top = max(pos_left.y1, pos_right.y1) + 0.04
+        for cfg in col_configs:
+            pos = cfg["_ax"].get_position()
+            x_center = (pos.x0 + pos.x1) / 2
+            y_top = pos.y1 + 0.04
             fig.text(
                 x_center, y_top, cfg["label"],
                 fontsize=26, fontweight="normal",
