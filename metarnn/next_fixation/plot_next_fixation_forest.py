@@ -1,10 +1,13 @@
 """Figure 5: forest plot of the next-fixation conditional logit.
 
-Ten z-scored candidate-level predictors, grouped into three categories shown
-as coloured background bands: resource-rational signals predicted by the
-optimal sampling policy, encoding-order biases, and heuristic biases. Compares
-human participants (hierarchical fixed effects, with per-subject random-effect
-dots) against the prior-memory network (fixed-effect estimate).
+Displays nine of the ten z-scored candidate-level predictors fit by the
+conditional logit (the alternation/previous-item predictor is fit but
+excluded from this display and analyzed in the supplementary text).
+Predictors are grouped into three categories shown as coloured background
+bands: resource-rational signals predicted by the optimal sampling policy,
+encoding-order biases, and biases. Compares human participants
+(hierarchical fixed effects, with per-subject random-effect dots) against
+the prior-memory network (fixed-effect estimate).
 
 Usage (from repo root):
   python metarnn/next_fixation/plot_next_fixation_forest.py
@@ -42,7 +45,6 @@ PREDICTOR_ORDER = [
     "is_recency_k_z",
     "abs_reward_k_z",
     "signed_reward_k_z",
-    "is_prev_fixation_k_z",
 ]
 
 LABELS = {
@@ -66,8 +68,8 @@ GROUPS = [
     ("Encoding Order",
      ["enc_lag_fwd_z", "enc_lag_bwd_z", "is_primacy_k_z", "is_recency_k_z"],
      {"human": "#64B5F6", "rnn": "#BBDEFB", "band": "#42A5F5"}),
-    ("Heuristics & Biases",
-     ["abs_reward_k_z", "signed_reward_k_z", "is_prev_fixation_k_z"],
+    ("Biases",
+     ["abs_reward_k_z", "signed_reward_k_z"],
      {"human": "#FF8A65", "rnn": "#FFCCBC", "band": "#FF7043"}),
 ]
 
@@ -95,7 +97,7 @@ def main():
     y_idx = {p: y_base[i] for i, p in enumerate(PREDICTOR_ORDER)}
     offset = 0.18
 
-    fig, ax = plt.subplots(1, 1, figsize=(11, 14))
+    fig, ax = plt.subplots(1, 1, figsize=(11, 13))
 
     series = [("human", human, +offset if rnn is not None else 0.0)]
     if rnn is not None:
@@ -136,8 +138,10 @@ def main():
 
     ax.set_xlabel("Effect on next location probability (log odds)", fontsize=24)
     ax.tick_params(axis="x", labelsize=22)
-    xmin, xmax = ax.get_xlim()
-    ax.set_xlim(xmin, xmax + 0.18)
+    # Hold the xlim to what it would have been with all ten predictors fit
+    # (when the previous-item predictor pushed the negative side wider),
+    # so the figure x-axis matches the prior version of Fig. 5.
+    ax.set_xlim(-0.3302, 0.5375)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
@@ -171,7 +175,7 @@ def main():
             transform=blend, clip_on=False, zorder=0))
         ax.text(section_label_x, (y_lo + y_hi) / 2, label,
                 color="black", va="center", ha="center",
-                fontsize=22, fontweight="bold",
+                fontsize=23.5, fontweight="bold",
                 transform=blend, clip_on=False, rotation=90)
 
     pad_inner = 0.45
