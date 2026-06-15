@@ -1,4 +1,4 @@
-# Flexible decisions arise from optimally sampling memories
+# Flexible decisions arise from resource-rational memory sampling
 
 This repository contains data and analysis code for the following manuscript [eventual bioRxiv link].
 
