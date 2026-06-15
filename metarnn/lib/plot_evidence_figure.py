@@ -394,7 +394,7 @@ def main():
     _plot_accumulation(ax_a, all_dfs, "dv", "", yticks=[-6, 0, 6])
     _plot_accumulation(ax_b, all_dfs, "v_belief", "", yticks=[-3, 0, 3])
 
-    ax_a.set_title("Network", fontsize=24)
+    ax_a.set_title("RNN", fontsize=24)
     ax_b.set_title("Metalevel MDP", fontsize=24)
 
     fig.text(0.5, 0.41, "Fixation number", ha="center", fontsize=_AXIS_LABEL_SIZE)

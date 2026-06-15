@@ -284,7 +284,7 @@ def _panel_B_dual(
 
         hit1 = _first_crossing(xs1, mean1, float(hline_y))
         hit2 = _first_crossing(xs2, mean2, float(hline_y))
-        ax.set_title("Network")
+        ax.set_title("RNN")
         ax.set_xlabel("")
         if show_ylabel:
             ax.set_ylabel("Cumulative fixation time")
@@ -349,7 +349,7 @@ def _panel_duration_dual(
             if np.isfinite(se).any() and len(se) == len(y):
                 ax.fill_between(x, y_plot - se_plot, y_plot + se_plot, color=color, alpha=alpha_band, linewidth=0)
 
-    ax.set_title("Network")
+    ax.set_title("RNN")
     ax.set_xlabel("Fixation number")
     ax.set_ylabel(str(y_label))
     if y_lim is not None:
@@ -410,7 +410,7 @@ def _panel_prop_relevant_dual(
             ax.fill_between(x, lo, hi, color=line_color, alpha=alpha_band, linewidth=0)
 
     ax.axhline(float(hline_y), color="black", linewidth=1.5, linestyle=":")
-    ax.set_title("Network")
+    ax.set_title("RNN")
     ax.set_xlabel("Fixation number")
     ax.set_ylabel(str(y_label))
     ax.set_ylim(float(y_lim[0]), float(y_lim[1]))
@@ -877,7 +877,7 @@ def create_figure(
             y_lim=(1.05, 1.3),
             keep_first_n=keep,
         )
-        axD.set_title("Network", pad=31)
+        axD.set_title("RNN", pad=31)
 
 
         # --- Panel E: human prop relevant ---
@@ -905,7 +905,7 @@ def create_figure(
             keep_first_n=keep,
             y_lim=(0.2, 0.8),
         )
-        axF.set_title("Network")
+        axF.set_title("RNN")
 
         # --- Panel G: human valence (uses recalled reward) ---
         _gh_ylim = (0.1, 0.4)
@@ -954,7 +954,7 @@ def create_figure(
         # Overall titles for G (Humans) and H (Network) panel groups.
         axG_take.text(0.5, 1.25, "Humans", transform=axG_take.transAxes,
                       ha='center', va='bottom', fontsize=24)
-        axH_take.text(0.5, 1.25, "Network", transform=axH_take.transAxes,
+        axH_take.text(0.5, 1.25, "RNN", transform=axH_take.transAxes,
                       ha='center', va='bottom', fontsize=24)
 
         suffix = f"_{tag}" if tag else ""

@@ -185,7 +185,7 @@ def _render_forest_plot(fig, ax, human, rnn, per_subj):
             plt.Line2D([0], [0], marker="o", linestyle="none",
                        markerfacecolor="#bbb", markersize=18,
                        markeredgecolor="black", markeredgewidth=1.5,
-                       label="Network"))
+                       label="RNN"))
     ax.legend(handles=legend_handles, fontsize=18, loc="upper right",
               bbox_to_anchor=(0.99, 0.98), frameon=True, fancybox=False,
               facecolor="white", edgecolor="black", handletextpad=0.3)
@@ -361,7 +361,7 @@ def main():
             "ds_yticks": [0, 0.2, 0.4, 0.6],
         },
         {
-            "label": "Network",
+            "label": "RNN",
             "sweep": nn_sweep,
             "ds_ylim": (0, 0.6),
             "ds_yticks": [0, 0.2, 0.4, 0.6],
@@ -390,7 +390,7 @@ def main():
         )
         compound_axes.append({"template": ax_template, "delta": ax_delta, **cfg})
 
-    # Place "Humans" / "Network" labels centred above each compound panel.
+    # Place "Humans" / "RNN" labels centred above each compound panel.
     # The Humans label is anchored to the same y-position as the forest
     # plot's title ("Predictors of next fixation location"), and the Network
     # label uses an analogous offset above its own panel for visual parity.

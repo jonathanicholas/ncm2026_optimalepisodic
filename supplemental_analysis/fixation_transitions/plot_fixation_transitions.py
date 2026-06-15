@@ -527,7 +527,7 @@ def create_figure(
                 "rl_yticks": [0, 0.03, 0.06],
             },
             {
-                "label": "Network",
+                "label": "RNN",
                 "sweep": nn_sweep,
                 "rl_ylim": (0, 0.02),
                 "rl_yticks": [0, 0.01, 0.02],

@@ -96,7 +96,7 @@ def main() -> None:
         ax.fill_between(x, y - ci, y + ci, color="black", alpha=0.15,
                          edgecolor="none", zorder=2)
         ax.text(
-            x[-1], y[-1] + ci[-1] + 0.003, "Network",
+            x[-1], y[-1] + ci[-1] + 0.003, "RNN",
             fontsize=20, color="black", va="bottom", ha="right",
         )
 
